@@ -253,7 +253,7 @@ function updateFilterCount() {
 // ローカルストレージから読み込み（全セット統合版）
 function loadFromLocalStorage() {
     // 各問題セットのデータを読み込み
-    for (let set = 1; set <= 3; set++) {
+    for (let set = 1; set <= 4; set++) {
         const storageKey = `dbmla_progress_set${set}`;
         const saved = localStorage.getItem(storageKey);
         if (saved) {
@@ -275,7 +275,7 @@ function loadFromLocalStorage() {
 // ローカルストレージに保存（全セット統合版）
 function saveToLocalStorage() {
     // 各問題セットごとにデータを分離して保存
-    for (let set = 1; set <= 3; set++) {
+    for (let set = 1; set <= 4; set++) {
         const storageKey = `dbmla_progress_set${set}`;
         const setChoices = {};
         const setTags = {};
