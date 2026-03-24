@@ -162,3 +162,5 @@ run_tests*.json
 
 .vscode/
 .github/
+.claude/
+input/
