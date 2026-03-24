@@ -1,87 +1,99 @@
-﻿// DBMLA 試験問題 - アプリケーションロジック（改善版）
+﻿// Databricks 練習問題 - アプリケーションロジック
 
 let allQuestions = []; // 全ての問題セットを統合した配列
 let selectedChoices = {};
 let currentQuestionId = null;
 let questionTags = {}; // 問題ごとのタグを保存
+let currentExamType = null; // 'dep' | 'genai'
+
+// 試験設定定義
+const EXAM_CONFIG = {
+    dep: {
+        title: '🎓 Databricks Engineer Professional 練習問題',
+        subtitle: 'Databricks Engineer Professional 試験対策',
+        storagePrefix: 'dep',
+        sets: [
+            { num: 1, label: '過去問1', data: () => window.questionsData1 },
+            { num: 2, label: '過去問2', data: () => window.questionsData2 },
+            { num: 3, label: '過去問3', data: () => window.questionsData3 },
+            { num: 4, label: '過去問4', data: () => window.questionsData4 },
+        ]
+    },
+    genai: {
+        title: '🤖 Databricks Generative AI Associate 練習問題',
+        subtitle: 'Databricks Generative AI Associate 試験対策',
+        storagePrefix: 'genai',
+        sets: [
+            { num: 1, label: '模擬試験1', data: () => window.questionsDataDbxg1 },
+            { num: 2, label: '模擬試験2', data: () => window.questionsDataDbxg2 },
+            { num: 3, label: '模擬試験3', data: () => window.questionsDataDbxg3 },
+            { num: 4, label: '模擬試験4', data: () => window.questionsDataDbxg4 },
+            { num: 5, label: '模擬試験5', data: () => window.questionsDataDbxg5 },
+            { num: 6, label: '模擬試験6', data: () => window.questionsDataDbxg6 },
+        ]
+    }
+};
+
+// 試験選択
+function selectExam(type) {
+    currentExamType = type;
+    const config = EXAM_CONFIG[type];
+
+    // ヘッダー更新
+    document.getElementById('app-title').textContent = config.title;
+    document.getElementById('app-subtitle').textContent = config.subtitle;
+
+    // オーバーレイを隠す
+    document.getElementById('exam-selection-overlay').classList.add('hidden');
+
+    // 状態リセット
+    allQuestions = [];
+    selectedChoices = {};
+    questionTags = {};
+    currentQuestionId = null;
+
+    // 問題ロード
+    loadAllQuestions();
+}
+
+// 試験選択画面に戻る
+function returnToExamSelection() {
+    document.getElementById('exam-selection-overlay').classList.remove('hidden');
+    document.getElementById('question-detail').innerHTML =
+        '<div class="detail-empty">← 左側から問題を選択してください</div>';
+}
 
 // 全問題セットをロードして統合
 function loadAllQuestions() {
+    if (!currentExamType) return;
     allQuestions = [];
 
-    // 過去問1
-    if (window.questionsData1) {
-        window.questionsData1.forEach(q => {
+    const config = EXAM_CONFIG[currentExamType];
+    config.sets.forEach(set => {
+        const data = set.data();
+        if (!data) return;
+        data.forEach(q => {
+            const correctIndices = q.choices
+                ? q.choices.map((c, i) => c.is_correct ? i : -1).filter(i => i >= 0)
+                : [];
             allQuestions.push({
                 ...q,
-                examSet: 1,
-                uniqueId: `1-${q.id}`,
+                examSet: set.num,
+                uniqueId: `${set.num}-${q.id}`,
                 number: q.id,
                 options: q.choices,
                 category: q.tags || '',
                 domain: q.tags || '',
                 choices: q.choices ? q.choices.map(c => c.text) : [],
-                correctIndex: q.choices ? q.choices.findIndex(c => c.is_correct) : -1,
+                correctIndex: correctIndices[0] ?? -1,
+                correctIndices,
+                isMultiCorrect: correctIndices.length > 1,
                 keyPoint: q.summary || ''
             });
         });
-    }
+    });
 
-    // 過去問2
-    if (window.questionsData2) {
-        window.questionsData2.forEach(q => {
-            allQuestions.push({
-                ...q,
-                examSet: 2,
-                uniqueId: `2-${q.id}`,
-                number: q.id,
-                options: q.choices,
-                category: q.tags || '',
-                domain: q.tags || '',
-                choices: q.choices ? q.choices.map(c => c.text) : [],
-                correctIndex: q.choices ? q.choices.findIndex(c => c.is_correct) : -1,
-                keyPoint: q.summary || ''
-            });
-        });
-    }
-
-    // 過去問3
-    if (window.questionsData3) {
-        window.questionsData3.forEach(q => {
-            allQuestions.push({
-                ...q,
-                examSet: 3,
-                uniqueId: `3-${q.id}`,
-                number: q.id,
-                options: q.choices,
-                category: q.tags || '',
-                domain: q.tags || '',
-                choices: q.choices ? q.choices.map(c => c.text) : [],
-                correctIndex: q.choices ? q.choices.findIndex(c => c.is_correct) : -1,
-                keyPoint: q.summary || ''
-            });
-        });
-    }
-
-    // 過去問4
-    if (window.questionsData4) {
-        window.questionsData4.forEach(q => {
-            allQuestions.push({
-                ...q,
-                examSet: 4,
-                uniqueId: `4-${q.id}`,
-                number: q.id,
-                options: q.choices,
-                category: q.tags || '',
-                domain: q.tags || '',
-                choices: q.choices ? q.choices.map(c => c.text) : [],
-                correctIndex: q.choices ? q.choices.findIndex(c => c.is_correct) : -1,
-                keyPoint: q.summary || ''
-            });
-        });
-    }
-
-    // データ読み込み完了後に初期化処理
+    populateExamSetCheckboxes();
     loadFromLocalStorage();
     populateDomainCheckboxes();
     renderQuestionsList();
@@ -90,11 +102,22 @@ function loadAllQuestions() {
     showFirstQuestion();
 }
 
-// 初期化
-document.addEventListener('DOMContentLoaded', () => {
-    // 全問題セットをロード
-    loadAllQuestions();
+// 問題セットのチェックボックスを動的生成
+function populateExamSetCheckboxes() {
+    if (!currentExamType) return;
+    const config = EXAM_CONFIG[currentExamType];
+    const container = document.getElementById('examSet-checkboxes');
+    if (!container) return;
+    container.innerHTML = config.sets.map(set => `
+        <label>
+            <input type="checkbox" name="examSet" value="${set.num}" checked>
+            ${set.label}
+        </label>
+    `).join('');
+}
 
+// 初期化（試験選択オーバーレイを表示するだけ。loadAllQuestionsはselectExam()から呼ぶ）
+document.addEventListener('DOMContentLoaded', () => {
     setupKeyboardShortcuts();
 });
 
@@ -223,8 +246,9 @@ function updateFilterCount() {
     let activeFilters = 0;
 
     // 問題セット
+    const examSetAll = document.querySelectorAll('input[name="examSet"]');
     const examSetChecks = document.querySelectorAll('input[name="examSet"]:checked');
-    if (examSetChecks.length < 3) {
+    if (examSetChecks.length < examSetAll.length) {
         activeFilters++;
     }
 
@@ -250,56 +274,56 @@ function updateFilterCount() {
     filterCount.textContent = activeFilters > 0 ? `(${activeFilters})` : '';
 }
 
-// ローカルストレージから読み込み（全セット統合版）
+// ローカルストレージから読み込み
 function loadFromLocalStorage() {
-    // 各問題セットのデータを読み込み
-    for (let set = 1; set <= 3; set++) {
-        const storageKey = `dbmla_progress_set${set}`;
+    if (!currentExamType) return;
+    const config = EXAM_CONFIG[currentExamType];
+    config.sets.forEach(set => {
+        const storageKey = `${config.storagePrefix}_progress_set${set.num}`;
         const saved = localStorage.getItem(storageKey);
         if (saved) {
-            const data = JSON.parse(saved);
-            if (data.selectedChoices) {
-                Object.keys(data.selectedChoices).forEach(num => {
-                    selectedChoices[`${set}-${num}`] = data.selectedChoices[num];
-                });
-            }
-            if (data.questionTags) {
-                Object.keys(data.questionTags).forEach(num => {
-                    questionTags[`${set}-${num}`] = data.questionTags[num];
-                });
-            }
+            try {
+                const data = JSON.parse(saved);
+                if (data.selectedChoices) {
+                    Object.keys(data.selectedChoices).forEach(num => {
+                        selectedChoices[`${set.num}-${num}`] = data.selectedChoices[num];
+                    });
+                }
+                if (data.questionTags) {
+                    Object.keys(data.questionTags).forEach(num => {
+                        questionTags[`${set.num}-${num}`] = data.questionTags[num];
+                    });
+                }
+            } catch (e) { /* 破損データは無視 */ }
         }
-    }
+    });
 }
 
-// ローカルストレージに保存（全セット統合版）
+// ローカルストレージに保存
 function saveToLocalStorage() {
-    // 各問題セットごとにデータを分離して保存
-    for (let set = 1; set <= 3; set++) {
-        const storageKey = `dbmla_progress_set${set}`;
+    if (!currentExamType) return;
+    const config = EXAM_CONFIG[currentExamType];
+    config.sets.forEach(set => {
+        const storageKey = `${config.storagePrefix}_progress_set${set.num}`;
         const setChoices = {};
         const setTags = {};
 
         Object.keys(selectedChoices).forEach(key => {
-            if (key.startsWith(`${set}-`)) {
-                const num = key.split('-')[1];
-                setChoices[num] = selectedChoices[key];
+            if (key.startsWith(`${set.num}-`)) {
+                setChoices[key.split('-')[1]] = selectedChoices[key];
             }
         });
-
         Object.keys(questionTags).forEach(key => {
-            if (key.startsWith(`${set}-`)) {
-                const num = key.split('-')[1];
-                setTags[num] = questionTags[key];
+            if (key.startsWith(`${set.num}-`)) {
+                setTags[key.split('-')[1]] = questionTags[key];
             }
         });
 
-        const data = {
+        localStorage.setItem(storageKey, JSON.stringify({
             selectedChoices: setChoices,
             questionTags: setTags
-        };
-        localStorage.setItem(storageKey, JSON.stringify(data));
-    }
+        }));
+    });
 }
 
 // キーボードショートカットの設定（uniqueId対応）
@@ -444,8 +468,8 @@ function renderQuestionsList() {
         const card = document.createElement('div');
         card.className = 'question-card';
 
-        const isAnswered = selectedChoices[q.uniqueId] !== undefined;
-        const isCorrect = isAnswered && selectedChoices[q.uniqueId] === q.correctIndex;
+        const isAnswered = isAnsweredDone(q.uniqueId);
+        const isCorrect = isAnsweredCorrectly(q.uniqueId);
 
         if (isAnswered) {
             card.classList.add('answered');
@@ -519,16 +543,12 @@ function filterQuestions() {
 
     // ステータスフィルタ
     if (statusFilter === 'unanswered') {
-        filteredQuestions = filteredQuestions.filter(q => selectedChoices[q.uniqueId] === undefined);
+        filteredQuestions = filteredQuestions.filter(q => !isAnsweredDone(q.uniqueId));
     } else if (statusFilter === 'correct') {
-        filteredQuestions = filteredQuestions.filter(q =>
-            selectedChoices[q.uniqueId] !== undefined &&
-            selectedChoices[q.uniqueId] === q.correctIndex
-        );
+        filteredQuestions = filteredQuestions.filter(q => isAnsweredCorrectly(q.uniqueId));
     } else if (statusFilter === 'incorrect') {
         filteredQuestions = filteredQuestions.filter(q =>
-            selectedChoices[q.uniqueId] !== undefined &&
-            selectedChoices[q.uniqueId] !== q.correctIndex
+            isAnsweredDone(q.uniqueId) && !isAnsweredCorrectly(q.uniqueId)
         );
     }
 
@@ -558,28 +578,52 @@ function showQuestionDetail(uniqueId) {
     const prevQuestion = hasPrev ? filteredQuestions[currentIndex - 1].uniqueId : null;
     const nextQuestion = hasNext ? filteredQuestions[currentIndex + 1].uniqueId : null;
 
+    // 複数選択の場合の選択状態を取得（旧フォーマット数値との混在を防ぐ）
+    const _stored = selectedChoices[uniqueId];
+    const multiSel = question.isMultiCorrect
+        ? (_stored && typeof _stored === 'object' && Array.isArray(_stored.indices)
+            ? _stored
+            : { indices: [], submitted: false })
+        : null;
+    const showAnswer = question.isMultiCorrect
+        ? (multiSel.submitted === true)
+        : selectedChoices[uniqueId] !== undefined;
+
     let choicesHTML = question.choices.map((choice, index) => {
         const letter = String.fromCharCode(65 + index);
-        const isSelected = selectedChoices[uniqueId] === index;
-        const isCorrect = index === question.correctIndex;
-        const showResult = selectedChoices[uniqueId] !== undefined;
+        const isSelected = question.isMultiCorrect
+            ? multiSel.indices.includes(index)
+            : selectedChoices[uniqueId] === index;
+        const isCorrect = question.correctIndices.includes(index);
 
         let choiceClass = 'choice';
+        if (question.isMultiCorrect) choiceClass += ' multi';
         if (isSelected) choiceClass += ' selected';
-        if (showResult && isCorrect) choiceClass += ' correct';
-        if (showResult && isSelected && !isCorrect) choiceClass += ' incorrect';
+        if (showAnswer && isCorrect) choiceClass += ' correct';
+        if (showAnswer && isSelected && !isCorrect) choiceClass += ' incorrect';
+
+        const indicator = question.isMultiCorrect
+            ? `<span class="choice-checkbox">${isSelected ? '☑' : '☐'}</span>`
+            : `<span class="choice-label">${letter}.</span>`;
 
         return `
             <div class="${choiceClass}" onclick="selectChoice('${uniqueId}', ${index})">
-                <span class="choice-label">${letter}.</span>
-                <span class="choice-text">${escapeHtml(choice)}</span>
+                ${indicator}
+                <span class="choice-text">${letter}. ${escapeHtml(choice)}</span>
             </div>
         `;
     }).join('');
 
     const codeBlock = question.code ? `<pre><code class="language-python">${escapeHtml(question.code)}</code></pre>` : '';
 
-    const showAnswer = selectedChoices[uniqueId] !== undefined;
+    const multiCorrectBadge = question.isMultiCorrect
+        ? `<span class="multi-correct-badge">複数選択 (${question.correctIndices.length}つ正解)</span>` : '';
+    const submitBtn = (question.isMultiCorrect && !showAnswer)
+        ? `<button class="submit-multi-btn" onclick="submitMultiCorrect('${uniqueId}')">答え合わせ</button>` : '';
+
+    const correctAnswerText = question.correctIndices
+        .map(i => `${String.fromCharCode(65 + i)}. ${escapeHtml(question.choices[i])}`)
+        .join('<br>');
 
     // タグアイコンボタン（右上配置）
     const hasTag = questionTags[uniqueId] || false;
@@ -591,12 +635,14 @@ function showQuestionDetail(uniqueId) {
                 <div class="header-left">
                     <div class="question-number">問題 ${question.examSet}-${question.number}</div>
                     <div class="domain-badge">${escapeHtml(question.domain)}</div>
+                    ${multiCorrectBadge}
                 </div>
                 ${tagButton}
             </div>
             <div class="question-text">${escapeHtml(question.question)}</div>
             ${codeBlock}
             <div class="choices">${choicesHTML}</div>
+            ${submitBtn}
             ${showAnswer ? `
                 <div class="answer-section">
                     <div class="answer-content show">
@@ -604,7 +650,7 @@ function showQuestionDetail(uniqueId) {
                             <strong>📌 要点:</strong> ${escapeHtml(question.keyPoint)}
                         </div>
                         <div class="correct-answer">
-                            正解: ${String.fromCharCode(65 + question.correctIndex)}. ${escapeHtml(question.choices[question.correctIndex])}
+                            正解: ${correctAnswerText}
                         </div>
                         <div class="explanation">
                             ${convertCodeBlocks(question.explanation)}
@@ -655,20 +701,79 @@ function updateFixedNextButton(hasNext, nextQuestion) {
     }
 }
 
+// ---- 正解判定ヘルパー ----
+
+// 回答済み（結果を確定した）かどうか
+function isAnsweredDone(uniqueId) {
+    const sel = selectedChoices[uniqueId];
+    if (sel === undefined) return false;
+    const question = allQuestions.find(q => q.uniqueId === uniqueId);
+    if (!question) return false;
+    return question.isMultiCorrect ? (sel.submitted === true) : true;
+}
+
+// 正解かどうか（未回答はfalse）
+function isAnsweredCorrectly(uniqueId) {
+    if (!isAnsweredDone(uniqueId)) return false;
+    const sel = selectedChoices[uniqueId];
+    const question = allQuestions.find(q => q.uniqueId === uniqueId);
+    if (!question) return false;
+    if (question.isMultiCorrect) {
+        if (!sel || typeof sel !== 'object' || !Array.isArray(sel.indices)) return false;
+        const sorted = [...sel.indices].sort((a,b)=>a-b);
+        const correct = [...question.correctIndices].sort((a,b)=>a-b);
+        return JSON.stringify(sorted) === JSON.stringify(correct);
+    }
+    return sel === question.correctIndex;
+}
+
+// ---- 選択処理 ----
+
 // 選択肢を選択（uniqueId対応）
 function selectChoice(uniqueId, choiceIndex) {
-    selectedChoices[uniqueId] = choiceIndex;
+    const question = allQuestions.find(q => q.uniqueId === uniqueId);
+    if (!question) return;
+
+    if (question.isMultiCorrect) {
+        const raw = selectedChoices[uniqueId];
+        const current = (raw && typeof raw === 'object' && Array.isArray(raw.indices))
+            ? raw
+            : { indices: [], submitted: false };
+        if (current.submitted) return; // 確定済みは変更不可
+        const pos = current.indices.indexOf(choiceIndex);
+        if (pos >= 0) {
+            current.indices.splice(pos, 1);
+        } else {
+            current.indices.push(choiceIndex);
+        }
+        selectedChoices[uniqueId] = current;
+        saveToLocalStorage();
+        showQuestionDetail(uniqueId);
+    } else {
+        selectedChoices[uniqueId] = choiceIndex;
+        saveToLocalStorage();
+        showQuestionDetail(uniqueId);
+        // 解説部分まで自動スクロール
+        setTimeout(() => {
+            const answerSection = document.querySelector('.answer-section');
+            if (answerSection) {
+                answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    }
+}
+
+// 複数選択問題の答え合わせ
+function submitMultiCorrect(uniqueId) {
+    const current = selectedChoices[uniqueId];
+    if (!current || current.indices.length === 0) return;
+    current.submitted = true;
     saveToLocalStorage();
     showQuestionDetail(uniqueId);
-
-    // 解説部分まで自動スクロール
     setTimeout(() => {
         const answerSection = document.querySelector('.answer-section');
         if (answerSection) {
-            answerSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }, 100);
 }
@@ -692,7 +797,11 @@ function copyQuestion(uniqueId, event) {
         text += `${letter}. ${choice}\n`;
     });
 
-    text += `\n【正解】\n${String.fromCharCode(65 + question.correctIndex)}. ${question.choices[question.correctIndex]}\n\n`;
+    text += `\n【正解】\n`;
+    question.correctIndices.forEach(i => {
+        text += `${String.fromCharCode(65 + i)}. ${question.choices[i]}\n`;
+    });
+    text += '\n';
     text += `【解説】\n${question.explanation}\n`;
 
     // クリップボードにコピー
@@ -792,8 +901,7 @@ function createCheatSheet() {
     // タグ付き問題または間違えた問題を取得
     const targetQuestions = allQuestions.filter(q => {
         const hasTag = questionTags[q.uniqueId];
-        const isIncorrect = selectedChoices[q.uniqueId] !== undefined &&
-                           selectedChoices[q.uniqueId] !== q.correctIndex;
+        const isIncorrect = isAnsweredDone(q.uniqueId) && !isAnsweredCorrectly(q.uniqueId);
         return hasTag || isIncorrect;
     });
 
@@ -811,8 +919,7 @@ function createCheatSheet() {
 
         // タグと不正解の情報を追加
         const hasTag = questionTags[q.uniqueId];
-        const isIncorrect = selectedChoices[q.uniqueId] !== undefined &&
-                           selectedChoices[q.uniqueId] !== q.correctIndex;
+        const isIncorrect = isAnsweredDone(q.uniqueId) && !isAnsweredCorrectly(q.uniqueId);
 
         byDomain[q.domain].push({
             question: q,
@@ -831,8 +938,7 @@ function createCheatSheet() {
 
     const taggedCount = targetQuestions.filter(q => questionTags[q.uniqueId]).length;
     const incorrectCount = targetQuestions.filter(q =>
-        selectedChoices[q.uniqueId] !== undefined &&
-        selectedChoices[q.uniqueId] !== q.correctIndex
+        isAnsweredDone(q.uniqueId) && !isAnsweredCorrectly(q.uniqueId)
     ).length;
     content += `　- ★タグ付き: ${taggedCount}問\n`;
     content += `　- 不正解: ${incorrectCount}問\n\n`;
@@ -885,7 +991,7 @@ function updateStats() {
     const filteredQuestions = filterQuestions();
     document.getElementById('visible-count').textContent = filteredQuestions.length;
 
-    const answeredCount = Object.keys(selectedChoices).length;
+    const answeredCount = allQuestions.filter(q => isAnsweredDone(q.uniqueId)).length;
     const totalCount = allQuestions.length;
     document.getElementById('answered-count').textContent = `${answeredCount}/${totalCount}`;
 
@@ -893,13 +999,7 @@ function updateStats() {
     if (answeredCount === 0) {
         document.getElementById('accuracy-rate').textContent = '-%';
     } else {
-        let correctCount = 0;
-        for (let uniqueId in selectedChoices) {
-            const question = allQuestions.find(q => q.uniqueId === uniqueId);
-            if (question && selectedChoices[uniqueId] === question.correctIndex) {
-                correctCount++;
-            }
-        }
+        const correctCount = allQuestions.filter(q => isAnsweredCorrectly(q.uniqueId)).length;
         const accuracy = Math.round((correctCount / answeredCount) * 100);
         document.getElementById('accuracy-rate').textContent = `${accuracy}%`;
     }

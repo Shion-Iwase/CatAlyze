@@ -3,16 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Databricks Engineer Professional 練習問題</title>
+    <title>Databricks 練習問題</title>
     <link rel="stylesheet" href="exam_style.css">
     <!-- Prism.js for syntax highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 </head>
 <body>
+    <!-- 試験選択オーバーレイ -->
+    <div class="exam-selection-overlay" id="exam-selection-overlay">
+        <div class="exam-selection-content">
+            <h1>🎓 Databricks 練習問題</h1>
+            <p>受験する試験を選択してください</p>
+            <div class="exam-cards">
+                <div class="exam-card" onclick="selectExam('dep')">
+                    <div class="exam-card-icon">🏗️</div>
+                    <div class="exam-card-title">Databricks Engineer Professional</div>
+                    <div class="exam-card-desc">データエンジニアリング専門試験<br>4セット 計160問</div>
+                </div>
+                <div class="exam-card" onclick="selectExam('genai')">
+                    <div class="exam-card-icon">🤖</div>
+                    <div class="exam-card-title">Databricks Generative AI Associate</div>
+                    <div class="exam-card-desc">生成AI基礎試験<br>6セット</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>🎓 Databricks Engineer Professional 練習問題</h1>
-            <p class="subtitle">Databricks Engineer Professional 試験対策</p>
+            <h1 id="app-title">🎓 Databricks 練習問題</h1>
+            <p class="subtitle" id="app-subtitle">試験を選択してください</p>
+            <button type="button" class="change-exam-btn" onclick="returnToExamSelection()">↩ 試験を変更</button>
         </header>
 
         <div class="controls">
@@ -57,12 +78,9 @@
                                 <h4>問題セット</h4>
                             </div>
                             <div class="filter-subsection-content expanded" id="examSet-content">
-                                <button class="toggle-all-btn" onclick="toggleAllCheckboxes('examSet')">すべてをチェックON/OFF</button>
-                                <div class="checkbox-group">
-                                    <label><input type="checkbox" name="examSet" value="1" checked> 過去問1</label>
-                                    <label><input type="checkbox" name="examSet" value="2" checked> 過去問2</label>
-                                    <label><input type="checkbox" name="examSet" value="3" checked> 過去問3</label>
-                                    <label><input type="checkbox" name="examSet" value="4" checked> 過去問4</label>
+                                <button type="button" class="toggle-all-btn" onclick="toggleAllCheckboxes('examSet')">すべてをチェックON/OFF</button>
+                                <div class="checkbox-group" id="examSet-checkboxes">
+                                    <!-- 試験選択後にJavaScriptで動的生成 -->
                                 </div>
                             </div>
                         </div>
@@ -155,10 +173,18 @@
         </div>
     </div>
 
+    <!-- DEP 問題データ -->
     <script src="exam_data1.js"></script>
     <script src="exam_data2.js"></script>
     <script src="exam_data3.js"></script>
     <script src="exam_data4.js"></script>
+    <!-- GenAI 問題データ -->
+    <script src="dbxg_exam_data1_ja.js"></script>
+    <script src="dbxg_exam_data2_ja.js"></script>
+    <script src="dbxg_exam_data3_ja.js"></script>
+    <script src="dbxg_exam_data4_ja.js"></script>
+    <script src="dbxg_exam_data5_ja.js"></script>
+    <script src="dbxg_exam_data6_ja.js"></script>
     <script src="exam_app.js"></script>
     <!-- Prism.js for syntax highlighting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
