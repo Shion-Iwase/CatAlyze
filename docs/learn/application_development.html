@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application Development - 学習チートシート</title>
+  <link rel="stylesheet" href="_common.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+  <header class="learn-header">
+    <div>
+      <div class="domain-label">Databricks Generative AI Associate</div>
+      <h1>⚙️ Application Development</h1>
+    </div>
+    <a href="index.html" class="back-btn">← 学習トップ</a>
+    <a href="../index.html" class="back-btn">📝 問題を解く</a>
+  </header>
+
+  <div class="learn-container">
+
+    <!-- 分野概要 -->
+    <div class="domain-overview">
+      <p>
+        GenAIアプリ開発の中核となる分野。プロンプト設計・RAGパイプライン・Embeddingモデル・LangChain・MLflow PyFuncなど、アプリケーションを実際に動かすための技術を幅広くカバーする。試験全体の約26%（84問）を占める最大の出題分野。
+      </p>
+    </div>
+
+    <!-- 出題内容概要 -->
+    <h2 class="section-title">📋 出題内容概要</h2>
+    <table class="overview-table">
+      <thead>
+        <tr><th>トピック</th><th>概要</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>プロンプトエンジニアリング</td><td>明示的指示・few-shot・フォーマット指定でLLMの出力品質を高める手法</td></tr>
+        <tr><td>RAGアーキテクチャ</td><td>ベクトルストアとLLMを組み合わせてハルシネーションを防ぐパイプライン設計</td></tr>
+        <tr><td>Embeddingモデル選択</td><td>ユースケースに応じたEmbeddingモデルの選び方とContext Length・次元の最適化</td></tr>
+        <tr><td>マルチターン対話</td><td>ステートトラッキング（メモリ）による複数ターンにわたるコンテキスト保持</td></tr>
+        <tr><td>LangChainとチェーン設計</td><td>Retriever・PromptTemplate・LLMを連結したマルチステップワークフロー構築</td></tr>
+        <tr><td>MLflow PyFunc</td><td>前処理・後処理を含むパイプライン全体をカプセル化するMLflowのインターフェース</td></tr>
+        <tr><td>ガードレール・セーフティフィルター</td><td>metaprompt・入力サニタイズ・コンテンツフィルターによる安全性確保</td></tr>
+        <tr><td>コンテキスト長とチャンキング</td><td>長文ドキュメントをトークン制限内で処理するための分割戦略</td></tr>
+        <tr><td>エージェントシステム</td><td>複数ツールを組み合わせて複雑タスクを自律処理するLLMベースのシステム</td></tr>
+        <tr><td>LLMモデル選択基準</td><td>コンテキストウィンドウ・ドメイン特化度・コスト・latencyによるモデル選択</td></tr>
+        <tr><td>評価指標</td><td>ROUGE・BLEU・Precision/Recall/NDCGなど用途別の評価指標の使い分け</td></tr>
+        <tr><td>コスト・Latency最適化</td><td>小型モデル・キャッシュ・Autoscaling・GPU構成によるコスト効率化</td></tr>
+        <tr><td>ファインチューニング</td><td>ドメイン固有知識・スタイル・トーンを習得させる追加学習の適切な適用場面</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 出題内容詳細 -->
+    <h2 class="section-title">📖 出題内容詳細</h2>
+
+    <!-- 1. プロンプトエンジニアリング -->
+    <section class="topic">
+      <h3>プロンプトエンジニアリング</h3>
+      <p>LLMから望ましい出力を引き出すために入力テキスト（プロンプト）を設計・最適化する技術。明示的な指示・出力フォーマット指定・few-shot examples・コンテキストの追加が主な手法。汎用的な指示では一貫性が下がるため、具体的な指示と例の組み合わせが重要。</p>
+      <ul>
+        <li><strong>明示的指示</strong>：「簡潔で事実に基づいた回答を提供してください」など具体的な動作を指定する</li>
+        <li><strong>出力フォーマット指定</strong>：箇条書き・フィールド名・JSON形式など出力形式をプロンプトで明示する</li>
+        <li><strong>few-shot examples</strong>：期待する入出力ペアの具体例をプロンプト内に含める（例：<code>{"date": "April 16, 2024", "order_id": "ORD123"}</code>）</li>
+        <li><strong>コンテキスト拡張</strong>：ユーザー入力に関連する追加情報をプロンプトに組み込む</li>
+        <li><strong>metaprompt（システムプロンプト）</strong>：モデルの振る舞い全体を定義するシステムレベルの指示</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>一貫した出力が必要 → 明示的指示 ＋ few-shot examplesの組み合わせ</li>
+          <li>JSON等の特定フォーマット出力 → フォーマット仕様 ＋ 出力例をプロンプトに含める</li>
+          <li>「一般的なプロンプト（汎用指示）」は不正解 → 不完全・不一貫な出力につながる</li>
+          <li>temperatureはトーン・精度を制御しない（ランダム性のみに影響）</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2. RAGアーキテクチャ -->
+    <section class="topic">
+      <h3>RAGアーキテクチャとパイプライン設計</h3>
+      <p>RAG（Retrieval-Augmented Generation）は、LLMの生成とベクトルストアからの文書検索を組み合わせたアーキテクチャ。モデルの知識限界を補い、最新情報・専門知識に基づいた回答生成を可能にする。ハルシネーション（幻覚）防止に最も有効な手法。</p>
+      <ul>
+        <li><strong>構成要素</strong>：Embeddingモデル → ベクトルストア → Retriever → LLM（生成）</li>
+        <li><strong>セマンティック検索</strong>：ベクトルDBによる意味ベースの検索（キーワード一致ではない）</li>
+        <li><strong>引用の追加</strong>：取得コンテンツに関連する引用をパイプラインに含めることで透明性向上</li>
+        <li><strong>フォールバックメカニズム</strong>：未解決のクエリを人間エージェントにエスカレーション</li>
+      </ul>
+      <p><strong>正しいデプロイ順序：</strong></p>
+      <ol>
+        <li>ドキュメントの前処理・Embeddingモデル準備</li>
+        <li>Embeddingの生成</li>
+        <li>ベクトルストアへの保存・インデックス作成</li>
+        <li>Retrieverの構築</li>
+        <li>エンドポイントのデプロイ</li>
+      </ol>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>パイプライン順序は必ず「Embedding生成 → ベクトルストア → Retriever → デプロイ」の順</li>
+          <li>「先にエンドポイントをデプロイして後でEmbeddingを設定」は不正解</li>
+          <li>法的・医療などニュアンスが必要なクエリ → キーワード検索ではなくセマンティック検索（ベクトルDB）</li>
+          <li>回答に引用が不足している場合 → temperatureやファインチューニングではなく、引用ステップをパイプラインに追加</li>
+          <li>ルールベースシステムは動的クエリに対応できず不正解</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. Embeddingモデル -->
+    <section class="topic">
+      <h3>Embeddingモデル選択と最適化</h3>
+      <p>Embeddingモデルはテキストを高次元ベクトルに変換し、意味的類似度に基づいた検索・推薦を可能にする。ユースケースに応じて選択すべき特性（Context Length・次元数・ドメイン特化度）が異なる。</p>
+      <ul>
+        <li><strong>Sentence Transformers</strong>：文全体のセマンティクスをキャプチャ。チャットボットの意図識別に最適</li>
+        <li><strong>ドメイン固有モデル</strong>：医療・法的・財務データで学習されたモデルは汎用モデルより高精度</li>
+        <li><strong>Word2Vec・GloVe</strong>：単語レベルのEmbeddingで文レベルのセマンティクスをキャプチャできない（文理解タスクには不適）</li>
+        <li><strong>ANN（近似最近傍）検索</strong>：高速ルックアップと高精度のバランス（FAQシステムに有効）</li>
+        <li><strong>Context Length</strong>：長い研究論文には長いContext LengthをサポートするEmbeddingモデルが必要</li>
+      </ul>
+      <table>
+        <thead><tr><th>ユースケース</th><th>優先すべき基準</th></tr></thead>
+        <tbody>
+          <tr><td>チャットボット意図識別</td><td>Sentence Transformers（文レベルセマンティクス）</td></tr>
+          <tr><td>長い研究論文の検索</td><td>Context Length ＋ セマンティック類似度精度</td></tr>
+          <tr><td>FAQの高速・高精度検索</td><td>セマンティック類似度ベンチマーク ＋ ANN検索</td></tr>
+          <tr><td>コスト・Latency優先（512tokenチャンク）</td><td>Context Length 512 ＋ モデルサイズ 0.13GB ＋ 次元384</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>Word2Vec・GloVeは文レベルのセマンティクスタスクに不適（単語レベルのみ）</li>
+          <li>BERT-base分類用モデルはセマンティック検索Embedding生成には最適化されていない</li>
+          <li>長い文書にはContext LengthとセマンティCk精度が推論コストより優先</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4. マルチターン対話 -->
+    <section class="topic">
+      <h3>マルチターン対話・ステートトラッキング</h3>
+      <p>複数のやり取りを通じてコンテキストを維持しながら会話を続けるシステム。各ターンで過去の会話内容を記憶・参照するステートトラッキング（メモリ）の実装が品質の鍵。</p>
+      <ul>
+        <li><strong>ステートトラッキング</strong>：以前の対話ターンのコンテキストを保持するメカニズム</li>
+        <li><strong>メモリ</strong>：ターンをまたいでユーザーコンテキストを保存する仕組み</li>
+        <li><strong>コンテキストリセットの問題</strong>：各ターン後にリセットすると断片的・不一貫な会話になる</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>チャットボットが以前のターンを忘れる問題 → ステートトラッキング（メモリ）の実装が解決策</li>
+          <li>「tokenの上限を増やす」は不正解 → 入力サイズに影響するがコンテキスト保持とは別の問題</li>
+          <li>「temperatureを下げる」は不正解 → ランダム性に影響するがコンテキスト記憶とは無関係</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. LangChain -->
+    <section class="topic">
+      <h3>LangChainとチェーン設計</h3>
+      <p>LLMを使ったマルチステップのワークフロー（チェーン）を構築するフレームワーク。入力処理・検索・生成を統合した複雑なパイプラインを、複数コンポーネントの連結で実現する。</p>
+      <ul>
+        <li><strong>LLMChain</strong>：PromptTemplate ＋ LLMを連結した基本的なチェーン</li>
+        <li><strong>Retriever</strong>：ベクトルストアからドキュメントを検索するコンポーネント</li>
+        <li><strong>PromptTemplate</strong>：ユーザー入力を構造化するためのテンプレート</li>
+        <li><strong>標準構成</strong>：PromptTemplate ＋ Retriever ＋ LLMの3点セット</li>
+        <li><strong>相互運用性</strong>：マルチステップ推論ではステージ間でデータをシームレスに共有することが重要</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>チェーンに含めるべき標準コンポーネント：PromptTemplate ＋ Retriever ＋ LLM</li>
+          <li>「ハードコードされたテンプレート」は不正解 → 多様なクエリへの柔軟性がない</li>
+          <li>「Retrieverなしのembedding」は不正解 → embeddingだけでは動的な検索ができない</li>
+          <li>「要約モデルを追加」は不正解 → 重要な詳細を削除し応答品質を低下させる</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. MLflow PyFunc -->
+    <section class="topic">
+      <h3>MLflow PyFuncモデル</h3>
+      <p>Pythonで書いた任意のモデルをMLflowのシリアライズ形式でラップし、前処理・後処理を含むパイプライン全体をカプセル化するインターフェース。デプロイ時に入出力の互換性と一貫性を確保する。</p>
+      <ul>
+        <li><strong>前処理（Preprocessing）</strong>：モデル入力前にデータをクリーニング・標準化・変換</li>
+        <li><strong>後処理（Postprocessing）</strong>：モデル出力を人間が読めるフォーマットに変換（例：スコア → 「承認」「拒否」）</li>
+        <li><strong>predict関数</strong>：PyFuncモデルのコアとなるメソッド。前処理・推論・後処理を内包</li>
+        <li><strong>Unity Catalogへの登録</strong>：モデルガバナンス・バージョン管理・アクセス制御のため</li>
+      </ul>
+      <p><strong>ワークフロー：</strong>入力前処理 → MLflow PyFunc予測 → 出力後処理（ユーザーフレンドリーなフォーマット）</p>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>PyFuncが有用な理由：推論の前後にデータを変換でき互換性と最適化された出力を確保（APIコスト最小化・再トレーニング削減ではない）</li>
+          <li>「後処理なしに前処理のみ」は不正解 → 後処理はモデル出力を解釈可能にするために不可欠</li>
+          <li>「生の入力を直接モデルに渡す」は不正解 → 前処理でデータ品質を確保し予測信頼性を向上させる</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7. ガードレール -->
+    <section class="topic">
+      <h3>ガードレール・セーフティフィルター</h3>
+      <p>LLMアプリケーションの出力が安全・正確であり、アプリケーション要件に沿っていることを確保するための制御機構。ハルシネーション・有害応答・プライバシー侵害などのリスクを軽減する。</p>
+      <ul>
+        <li><strong>metapromptによるガードレール</strong>：機密情報を出力しないよう指示するルールをシステムプロンプトで定義</li>
+        <li><strong>入力サニタイズ</strong>：特殊文字の削除とデータ形式検証によるインジェクション攻撃防止</li>
+        <li><strong>コンテンツフィルタリング</strong>：安全でない・有害な応答を除外する事前定義フィルター</li>
+        <li><strong>Retrievalベース拡張</strong>：検索した情報で応答を根拠づけ不正確な生成を防止</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>ガードレールの目的：latency削減・多様性向上ではなく、安全・正確・アプリ要件整合の確保</li>
+          <li>インジェクション攻撃防止 → 入力サニタイズ（特殊文字削除 ＋ データ形式検証）</li>
+          <li>「temperatureを下げれば安全になる」は不正解 → temperatureは安全性に影響しない</li>
+          <li>「監視・ログだけで十分」は不正解 → 悪意ある入力の実行を防がない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. チャンキング -->
+    <section class="topic">
+      <h3>コンテキスト長とチャンキング戦略</h3>
+      <p>LLMやEmbeddingモデルにはトークン制限（Context Length）があるため、長いドキュメントは適切なサイズに分割（チャンキング）して処理する。チャンキング戦略の選択は検索精度・要約品質に直接影響する。</p>
+      <ul>
+        <li><strong>セクションベースチャンキング</strong>：ドキュメントの論理的なセクション（「イントロ」「調査結果」「条項」）に基づいて分割。文書構造を保持し品質が高い</li>
+        <li><strong>均等サイズチャンキング</strong>：一定トークン数で機械的に分割。論理的なセクションを壊すリスクがある</li>
+        <li><strong>オーバーラップチャンキング</strong>：チャンク間に重複を持たせてコンテキストを補完するが、論理的セクション境界との整合が取れない場合がある</li>
+        <li><strong>モデルとの一致</strong>：チャンクサイズ（例：512token）とEmbeddingモデルのContext Length（512）を合わせる</li>
+      </ul>
+      <table>
+        <thead><tr><th>ドキュメント種別</th><th>推奨戦略</th></tr></thead>
+        <tbody>
+          <tr><td>10,000語超の政府レポート・学術論文</td><td>セクション（イントロ・調査結果等）に基づくチャンキング</td></tr>
+          <tr><td>法的契約書</td><td>論理的セクション（条項・付属文書）に基づくチャンキング</td></tr>
+          <tr><td>512token制限のEmbeddingモデル利用時</td><td>512token以内のチャンクに分割して各チャンクを独立処理</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「ドキュメント全体を1チャンク」は不正解 → トークン上限を超える</li>
+          <li>「均等サイズに分割」は一般に不正解 → 意味のあるセクションを壊すリスク</li>
+          <li>「より長いContext Lengthのモデルを新規トレーニング」は不正解 → コスト大・実現性が低い</li>
+          <li>「要約モデルで長さを短縮」は不正解 → 重要な詳細が欠損する</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9. エージェント -->
+    <section class="topic">
+      <h3>エージェントシステムとツール設計</h3>
+      <p>複数のツール・データソース・操作を組み合わせて複雑なタスクを自律的に処理するLLMベースのシステム。注文状況・配送・返金など複数操作が必要なカスタマーサポートに適している。</p>
+      <ul>
+        <li><strong>ツール定義</strong>：利用可能な機能（create_record, update_record, delete_record など）を明示的に定義し使用例も提供</li>
+        <li><strong>プロンプトテンプレートによる機能公開</strong>：エージェントの機能と使用例を指定したテンプレートで正しいツール呼び出しを誘導</li>
+        <li><strong>マルチターン対応</strong>：複数回のやり取りをまたいでコンテキストを維持</li>
+        <li><strong>フォールバックメカニズム</strong>：処理できないクエリは人間にエスカレーション</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>エージェント機能の最善の公開方法 → 機能と使用例を明示したプロンプトテンプレート</li>
+          <li>「embeddingを適用」は不正解 → 検索は支援するが機能公開は処理しない</li>
+          <li>「ルールベースシステム」は不正解 → 動的なマルチエージェントタスクへの柔軟性が不足</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10. LLMモデル選択 -->
+    <section class="topic">
+      <h3>LLMモデル選択基準</h3>
+      <p>ユースケースに応じて適切なLLMを選択することが重要。コンテキストウィンドウサイズ・ドメイン特化度・多言語対応・コスト・latencyが主要な選択基準。</p>
+      <table>
+        <thead><tr><th>モデル / 特性</th><th>適したユースケース</th></tr></thead>
+        <tbody>
+          <tr><td>MPT-30B（大コンテキストウィンドウ）</td><td>長いドキュメントの処理・大量のコンテキストが必要なタスク</td></tr>
+          <tr><td>Llama2-70B（高品質・機密処理可）</td><td>機密データを扱うタスク・高品質な出力が必要なケース</td></tr>
+          <tr><td>CodeLlama-34B</td><td>コード生成・コードのデバッグ</td></tr>
+          <tr><td>小型ファインチューニング済み ＋ キャッシュ</td><td>コスト効率と低latencyのバランス（商品推薦など）</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th>ユースケース</th><th>優先基準</th></tr></thead>
+        <tbody>
+          <tr><td>リアルタイム言語翻訳</td><td>低latency ＋ 高翻訳精度</td></tr>
+          <tr><td>eコマース多言語チャットボット</td><td>多言語パフォーマンスベンチマーク</td></tr>
+          <tr><td>財務アドバイス生成</td><td>ドメイン精度 ＋ 財務データセット精度（流暢さより優先）</td></tr>
+          <tr><td>学術論文要約</td><td>学術テキストでファインチューニングされた要約LLM</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「モデルサイズが大きいほど良い」は不正解 → latency増加・コスト効率低下</li>
+          <li>財務アドバイス → 流暢さ（低perplexity）やlatencyよりドメイン精度とコンプライアンスが優先</li>
+          <li>コスト効率 → 最大モデルではなく小型ファインチューニング済みモデル ＋ クエリキャッシュ</li>
+          <li>「パラメータ数が多いモデル」は不正解 → パラメータ数だけではドメイン関連性・精度が保証されない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11. 評価指標 -->
+    <section class="topic">
+      <h3>評価指標（ROUGE・BLEU・Precision/Recall/NDCG）</h3>
+      <p>LLMアプリケーションの品質評価には用途に応じた指標の選択が重要。「要約品質」「翻訳品質」「検索品質」「運用パフォーマンス」の4カテゴリに分類できる。</p>
+      <table>
+        <thead><tr><th>指標</th><th>用途</th><th>特徴</th></tr></thead>
+        <tbody>
+          <tr><td>ROUGE</td><td>テキスト要約評価</td><td>生成された要約と参照要約のコンテンツ重複を測定</td></tr>
+          <tr><td>BLEU</td><td>機械翻訳評価</td><td>出力テキストと参照テキストの類似度を測定（要約には不適）</td></tr>
+          <tr><td>Precision</td><td>検索精度</td><td>取得ドキュメントのうち関連するものの割合</td></tr>
+          <tr><td>Recall</td><td>検索網羅性</td><td>全関連ドキュメントのうち取得できたものの割合</td></tr>
+          <tr><td>NDCG</td><td>検索ランキング品質</td><td>関連性とランキング順序を評価</td></tr>
+          <tr><td>Perplexity</td><td>言語モデルの流暢さ</td><td>確信度を測定（要約品質は測定しない）</td></tr>
+          <tr><td>Latency/Throughput/エラーレート</td><td>本番運用監視</td><td>応答性・処理能力・信頼性の監視指標</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>要約品質の評価 → ROUGE（BLEUは翻訳向けで要約には不適）</li>
+          <li>法的ドキュメント要約の評価 → ROUGE ＋ Recall（カバレッジも重要）</li>
+          <li>RAGシステムの評価 → Precision/Recall ＋ NDCG</li>
+          <li>本番LLM監視 → Latency・Throughput・エラーレート（BLEU・F1は運用監視指標ではない）</li>
+          <li>「Perplexityで要約品質を評価」は不正解 → Perplexityは流暢さを評価するが情報量は測定しない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12. コスト・Latency最適化 -->
+    <section class="topic">
+      <h3>コスト・Latency最適化</h3>
+      <p>本番環境でのLLMアプリケーション運用において、コスト効率と低latencyを両立させることが重要。モデルサイズ・インフラ・キャッシュ・スケーリング戦略が主な最適化手段。</p>
+      <ul>
+        <li><strong>小型ファインチューニング済みモデル</strong>：品質を維持しながらコストとlatencyを削減</li>
+        <li><strong>クエリキャッシュ</strong>：頻繁なクエリをキャッシュし繰り返しクエリのパフォーマンス向上</li>
+        <li><strong>水平スケーリング ＋ Autoscaling</strong>：変動するワークロードに対応し過少/過剰リソースを防ぐ</li>
+        <li><strong>GPU ＋ 分散クラウドインフラ</strong>：高throughputのリアルタイム要約・EmbeddingにはGPUアクセラレーション ＋ 分散クラウドインフラ</li>
+        <li><strong>Inference Tables（Databricks）</strong>：本番エンドポイントのリクエスト・レスポンスをネイティブにログ記録</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>コスト・Latency優先（512tokenチャンク）→ Context Length 512 ＋ モデルサイズ 0.13GB ＋ 次元384 の最小構成</li>
+          <li>スケーラビリティ最適化 → Autoscalingポリシーによる水平スケーリング（固定リソースやレート制限だけでは不十分）</li>
+          <li>「ローカルストレージ」は不正解 → 本番システムのスケーラビリティとlatencyを損なう</li>
+          <li>「シングルノードサーバー」は不正解 → 高需要アプリには不十分</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 13. ファインチューニング -->
+    <section class="topic">
+      <h3>ファインチューニングの適用場面</h3>
+      <p>事前学習済みモデルを特定ドメインのデータでさらに学習させる手法。汎用モデルではカバーしきれないドメイン固有の知識・スタイル・トーンをモデルに習得させるために使用する。</p>
+      <ul>
+        <li>ドメイン固有の用語・知識が必要（法的・医療・財務テキスト）</li>
+        <li>特定のトーン・スタイルを維持したい（丁寧なカスタマーサービス）</li>
+        <li>学術論文の要約など特定タスクへの最適化</li>
+        <li>企業のブランディングや通信ガイドラインへの適合</li>
+      </ul>
+      <table>
+        <thead><tr><th>問題</th><th>適切な解決策</th><th>ファインチューニングでは不十分な理由</th></tr></thead>
+        <tbody>
+          <tr><td>Retrievalの精度が低い</td><td>ドメイン固有Embeddingモデル・ベクトルDB改善</td><td>生成を改善するがretrieval自体には対処しない</td></tr>
+          <tr><td>回答に引用が不足</td><td>パイプラインに引用ステップを追加</td><td>引用問題を直接解決しない</td></tr>
+          <tr><td>スケーラビリティの確保</td><td>Autoscalingによる水平スケーリング</td><td>throughput向上には直接対処しない</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>丁寧なトーン ＋ ドメイン知識 → 丁寧なトーンのデータセット ＋ ドメインデータでのファインチューニング</li>
+          <li>学術要約 → 学術テキストでファインチューニングされた要約LLM（汎用モデルはドメイン固有インサイトが不足）</li>
+          <li>「retrieval精度低下にファインチューニング」は不正解 → retrieval問題はEmbeddingモデルやベクトルDBで対処</li>
+          <li>「temperatureを上げて多様な要約」は不正解 → ランダム性が増加し要約精度が低下</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 理解度チェックシート -->
+    <div class="check-sheet">
+      <div class="check-sheet-title">✅ 理解度チェックシート</div>
+      <p class="check-sheet-desc">答えを考えてから「▶ 答えを見る」を開いてください</p>
+
+      <div class="check-item">
+        <p class="check-question">Q1. プロンプトにfew-shot examplesを含めることで何が改善されますか？どのような場合に特に有効ですか？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. LLMへの明確なガイダンスとなり、出力フォーマットの精度と一貫性が向上する。特に、JSONなど特定フォーマットでの出力が求められる場合や、出力の形式が厳密に決まっているタスクに有効。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q2. RAGパイプラインの正しいデプロイ順序を5ステップで説明してください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① ドキュメントの前処理・Embeddingモデル準備 → ② Embeddingの生成 → ③ ベクトルストアへの保存・インデックス作成 → ④ Retrieverの構築 → ⑤ エンドポイントのデプロイ。エンドポイントのデプロイは必ず最後。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q3. チャットボットが以前のターンの内容を忘れてしまう問題の原因と解決策は何ですか？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 原因はステートトラッキング（メモリ）が実装されておらず、各ターン後にコンテキストがリセットされること。解決策はステートトラッキングの実装（過去の対話ターンのコンテキストを保持する仕組みの追加）。tokenの上限増加やtemperatureの変更では解決しない。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q4. テキスト要約の品質評価に適した指標と、翻訳品質に適した指標をそれぞれ答えてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 要約品質 → ROUGE（生成要約と参照要約のコンテンツ重複を測定）。翻訳品質 → BLEU（出力テキストと参照テキストの類似度を測定）。BLEUは要約評価に使うと不正解になるので注意。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q5. MLflow PyFuncモデルの前処理・後処理の役割をそれぞれ説明してください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 前処理：モデル入力前にデータをクリーニング・標準化・変換し、予測信頼性を向上させる。後処理：モデルの生の出力（スコアなど）を人間が読めるフォーマット（「承認」「拒否」など）に変換する。両方揃って初めてパイプラインが完結する。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q6. 10,000語を超える法的契約書をRAGシステムのEmbedding処理に使う場合、どのチャンキング戦略が最適ですか？また、均等サイズ分割が不適な理由は？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 最適策：論理的セクション（条項・付属文書）に基づくセクションベースチャンキング。均等サイズ分割が不適な理由：意味のある論理的セクション境界を無視して機械的に分割するため、一つの条項が複数チャンクに分断され検索・要約品質が低下する。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q7. ファインチューニングが適切でない場面を2つ挙げ、それぞれの適切な解決策を説明してください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① Retrievalの精度が低い場合 → ドメイン固有EmbeddingモデルやベクトルDBの改善が適切（ファインチューニングは生成を改善するがretrieval自体には対処しない）。② スケーラビリティの確保 → Autoscalingによる水平スケーリングが適切（ファインチューニングはthroughput向上に対処しない）。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q8. LangChainでRAGチェーンを構築する際の標準コンポーネント3点を挙げてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① PromptTemplate（ユーザー入力を構造化）② Retriever（ベクトルストアからドキュメントを検索）③ LLM（応答を生成）。この3点が標準構成。要約モデルの追加は重要な詳細を削除するため不正解。</p>
+          </div>
+        </details>
+      </div>
+
+      <a href="../index.html?exam=genai" class="cta-exam">📝 この分野の問題を解く</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>

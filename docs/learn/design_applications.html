@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Applications - 学習ガイド</title>
+  <link rel="stylesheet" href="_common.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+  <div class="learn-header">
+    <div class="learn-header-inner">
+      <a href="index.html" class="back-btn">← 学習トップへ</a>
+      <h1>Design Applications</h1>
+      <p>プロンプト設計・RAGアーキテクチャ設計・コンポーネント選択・Temperature・マルチターン対話設計などを扱う。約40問・15トピック。</p>
+    </div>
+  </div>
+
+  <div class="learn-container">
+
+    <!-- 1. この分野の概要 -->
+    <section class="domain-overview">
+      <h2 class="section-title">この分野の概要</h2>
+      <p>
+        Design Applications 分野は、GenAIアプリケーションを「どう設計するか」に焦点を当てる。
+        プロンプト設計（出力フォーマット・Few-Shot例・入出力定義）からRAGアーキテクチャの構成選択、
+        適切なモデルタイプの選定、Temperature制御、マルチターン対話のメモリ管理まで、
+        システム設計上の意思決定を問う問題が中心。
+        「なぜそのコンポーネントを選ぶか」という設計判断の根拠を理解することが合格の鍵。
+      </p>
+    </section>
+
+    <!-- 2. 出題内容概要 -->
+    <section>
+      <h2 class="section-title">出題内容概要</h2>
+      <table class="overview-table">
+        <thead>
+          <tr><th>トピック</th><th>概要</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>プロンプト設計（出力フォーマット指定）</td><td>JSONサンプルなど具体的な例を添付して出力形式を明示する手法</td></tr>
+          <tr><td>プロンプト設計（Few-Shot例の活用）</td><td>成功例（入出力ペア）をプロンプトに添付してLLMをガイドする手法</td></tr>
+          <tr><td>プロンプト設計（コンテキスト・入出力定義）</td><td>パイプライン設計の最初のステップとして入出力フィールドを明確化する</td></tr>
+          <tr><td>RAGアーキテクチャ設計</td><td>Retriever＋LLMの組み合わせ選択とパイプラインの正しい構築順序</td></tr>
+          <tr><td>LLMとコンポーネント選択</td><td>タスク別に適切なモデルタイプ（LLM/Embedding/分類/要約）を選択する</td></tr>
+          <tr><td>Temperature パラメータ</td><td>出力のランダム性・創造性を制御するパラメータの正しい理解</td></tr>
+          <tr><td>マルチターン対話とメモリモジュール</td><td>複数回のやり取りで会話コンテキストを維持するメモリモジュール</td></tr>
+          <tr><td>マルチステップ推論パイプラインの設計原則</td><td>ツール間の相互運用性とデータのシームレスな受け渡し</td></tr>
+          <tr><td>ベクトルデータベース</td><td>Embeddingベクトルを保存・検索するセマンティック検索の基盤技術</td></tr>
+          <tr><td>Embeddingモデルの選択と活用</td><td>Sentence Transformers・デュアルエンコーダー・ドメイン固有fine-tuningの使い分け</td></tr>
+          <tr><td>LangChainによるワークフローオーケストレーション</td><td>RAGパイプラインや対話型エージェントのモジュール構築フレームワーク</td></tr>
+          <tr><td>System Prompt / Metapromptによるスコープ制御</td><td>LLMの動作範囲・制約をあらかじめ定義するシステムプロンプトの活用</td></tr>
+          <tr><td>セーフティフィルターと入力バリデーション</td><td>悪意ある入力・プロンプトインジェクションからアプリを守る仕組み</td></tr>
+          <tr><td>テキスト要約 vs 他タスクの使い分け</td><td>要約・感情分析・NER・分類・RAGの適用範囲の正確な理解</td></tr>
+          <tr><td>構造化出力（JSON形式）の生成</td><td>フィールド指定・サンプルスキーマ添付でJSONの精度を高める手法</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. 出題内容詳細 -->
+    <section>
+      <h2 class="section-title">出題内容詳細</h2>
+
+      <section class="topic">
+        <h3>プロンプト設計（出力フォーマット指定）</h3>
+        <p>
+          LLMに「何を」「どんな形式で」出力してほしいかを明示的に指示するプロンプト技術。
+          JSON・箇条書き・特定フィールドの列挙など、具体的なフォーマットを指定することで出力の一貫性と精度が大幅に向上する。
+        </p>
+        <ul>
+          <li><strong>JSON出力指定</strong>: <code>{"date": "...", "sender_email": "...", "order_id": "..."}</code> のようなサンプルスキーマを例示することで、LLMが正確な構造の出力を生成する</li>
+          <li><strong>フィールド列挙</strong>: 「アクションアイテム、参加者、決定事項を含む」など必須フィールドを明示し省略を防ぐ</li>
+          <li><strong>具体的な制約指定</strong>: 「100語以内」「ステップバイステップで」などの制約も出力制御に有効</li>
+          <li><strong>Few-Shotとの組み合わせ</strong>: フォーマット指定 + 成功例の提示でさらに精度が向上する</li>
+          <li><strong>Temperatureとの独立性</strong>: Temperatureはランダム性を制御するものであり、応答の長さや形式は制御しない</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「最高精度を確保するプロンプト」は必ず<strong>具体的な出力フォーマット例（JSONサンプルなど）を含むもの</strong>が正解</li>
+            <li>「JSON形式で返してください」だけでは不十分。<strong>具体的な例を添付</strong>することが精度向上に不可欠</li>
+            <li>出力の長さや形式の制御は、Temperatureではなくプロンプト内の明示的な指示が必要</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>プロンプト設計（Few-Shot例の活用）</h3>
+        <p>
+          プロンプトに成功例（入出力ペア）を複数添付し、LLMが望ましい出力パターンを学習するよう誘導する手法。
+          Zero-Shot（例なし）より安定した出力が得られ、特定のトーン・構造・ドメインへの誘導に有効。
+        </p>
+        <ul>
+          <li><strong>Few-Shot プロンプト</strong>: 2〜5個程度の成功例をプロンプト内に提示する</li>
+          <li><strong>Zero-Shot プロンプト</strong>: 例なしで指示のみ。汎用タスクには使えるが、ドメイン特有・フォーマット固定のタスクには不十分</li>
+          <li><strong>One-Shot プロンプト</strong>: 例を1つだけ提示する中間形式</li>
+          <li><strong>出力フォーマットの誘導</strong>: 例を通じて「説明を含めずに要約だけ出力する」などのフォーマットをモデルに伝える</li>
+          <li><strong>モデル変更不要</strong>: Few-Shotは分類モデルのトレーニングやファインチューニングとは別物であり、モデル変更不要</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「LLMが要約に生成方法の説明を付けてしまう問題への対処」→ Few-Shot例で望ましいフォーマット（説明なしの要約）を示すことが正解</li>
+            <li>「広告見出しや製品説明の生成精度向上」→ 成功例の提示 + ターゲット・トーン・目標の明示が正解</li>
+            <li>後処理で改行分割して不要部分をカットするのは応急処置に過ぎず、Few-Shotで事前に形式を教える方が根本的解決策</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>プロンプト設計（コンテキスト・入出力定義）</h3>
+        <p>
+          パイプライン設計の<strong>最初のステップ</strong>として、LLMへの入力フィールドと期待する出力フィールドを明確に定義する。
+          これによりシステム全体のアーキテクチャ設計がガイドされ、モデル選択の基準も決まる。
+        </p>
+        <ul>
+          <li><strong>入力フィールド定義</strong>: <code>budget</code>, <code>preferred_weather</code>, <code>activities</code> などユーザーから受け取るデータ項目を特定する</li>
+          <li><strong>出力フィールド定義</strong>: <code>destination</code>, <code>activity_recommendations</code> などシステムが返すべきデータ項目を特定する</li>
+          <li><strong>コンテキスト注入</strong>: 「ユーザーは遅延配送について質問しています」などの具体的な状況をプロンプトに含めることで関連性の高い応答が得られる</li>
+          <li><strong>追加コンテキスト拡張</strong>: ユーザーが明示しなかった情報（ポーションサイズ・食事の好み・予算）をプロンプトに補完することで出力品質が向上する</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>旅行チャットボット・食事プラン推薦・カスタマーサービスなど、<strong>パイプライン設計の「最初のステップ」は必ず入出力定義</strong></li>
+            <li>「モデル選択」「フィードバック収集」「データベース構築」は入出力定義の<strong>後</strong>に行う</li>
+            <li>会話型AIのプロンプトでは「トーンのみ指定」ではなく「明確なコンテキスト＋望ましい出力」の両方を含めることが正解</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>RAGアーキテクチャ設計（Retriever + LLM の組み合わせ選択）</h3>
+        <p>
+          Retrieval-Augmented Generation（RAG）は、ベクトルDBから関連ドキュメントを検索し（Retrieval）、
+          その内容をLLMに与えて回答を生成する（Generation）アーキテクチャ。
+          Retrieverと LLMの適切な組み合わせと、パイプラインの正しい構築順序がシステム品質を決定する。
+        </p>
+        <ul>
+          <li><strong>Retriever</strong>: 関連ドキュメントやセクションをベクトル類似度検索で取得するコンポーネント</li>
+          <li><strong>Embeddingモデル</strong>: テキストをベクトル空間に変換し、セマンティックな類似度計算を可能にする</li>
+          <li><strong>LLM（生成コンポーネント）</strong>: Retrieverが取得したコンテキストをもとに自然言語の回答を生成する</li>
+          <li><strong>ドメイン固有fine-tuned Embedding</strong>: 特定ドメイン（法律・金融）のテキストでfine-tuningすることで検索精度が向上する</li>
+        </ul>
+        <table class="compare-table">
+          <thead>
+            <tr><th>RAGパイプライン構築の正しい順序</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>① Embeddingモデルを選定しドキュメントのEmbeddingを生成</td></tr>
+            <tr><td>② Vector SearchインデックスにEmbeddingを保存</td></tr>
+            <tr><td>③ Retrieverコンポーネントを構築（インデックスと接続）</td></tr>
+            <tr><td>④ 生成モデル（LLM/要約モデル）をデプロイ</td></tr>
+          </tbody>
+        </table>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>法的契約書レビュー・医療ガイドラインQA・在庫QAなど多様なユースケースで<strong>Retriever + LLMの組み合わせ</strong>が正解パターンとして繰り返し登場する</li>
+            <li>要約モデル単体・分類モデル単体はいずれも「動的なクエリへの対応」や「引用付き回答生成」ができないため不正解</li>
+            <li>検索精度（Precision）が低い場合は、LLMを変えても解決しない。<strong>Embeddingモデルのfine-tuning＋セマンティック類似度最適化のRetriever</strong>が改善策</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>LLMとコンポーネント選択（タスク別モデル選択）</h3>
+        <p>
+          タスクの性質に応じて最適なモデルタイプ（LLM・Embeddingモデル・分類モデル・要約モデルなど）を選択することは、
+          GenAIアプリ設計の根幹。各コンポーネントの役割と限界を明確に理解することが重要。
+        </p>
+        <ul>
+          <li><strong>LLM</strong>: 動的なテキスト生成・構造化出力・推論・要約・テンプレート生成に最適。「動的に生成する」タスクにはLLMを使う</li>
+          <li><strong>Embeddingモデル</strong>: テキストのセマンティックな意味をベクトルに変換。セマンティック検索・類似度計算に使用</li>
+          <li><strong>分類モデル</strong>: カテゴリへの割り当て（ラベル付け）のみ。生成や検索はできない</li>
+          <li><strong>要約モデル</strong>: テキストを短くまとめる（情報圧縮）。クエリへの回答生成や構造化出力生成はできない</li>
+          <li><strong>RAGタスク</strong>: 検索と生成を組み合わせてナレッジベースから動的に応答を生成。旅行チャットボット・Q&Aシステムに適合</li>
+        </ul>
+        <table class="compare-table">
+          <thead>
+            <tr><th>タスク</th><th>適切なモデル</th><th>不正解の典型例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>会議議事録の主要ポイント・アクションアイテム特定</td><td>テキスト要約</td><td>NER・感情分析・テキスト分類</td></tr>
+            <tr><td>製品レビューから共通テーマ＋センチメントを強調した要約</td><td>テキスト要約</td><td>感情分析（トーン判断のみ）</td></tr>
+            <tr><td>旅行チャットボット（目的地回答・活動提案・宿泊推薦）</td><td>RAG</td><td>テキスト分類・NER・要約</td></tr>
+            <tr><td>求人票→評価チェックリスト変換</td><td>Embedding + LLM</td><td>要約・分類・ルールベース</td></tr>
+            <tr><td>非構造化フィードバック→構造化タスク（優先事項・期限）</td><td>LLM</td><td>要約・分類・ルールベース</td></tr>
+            <tr><td>在庫QAシステム</td><td>Retriever + LLM</td><td>Embedding単体・要約・分類</td></tr>
+          </tbody>
+        </table>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>感情分析はトーン（ポジティブ/ネガティブ）を判断するのみで、共通テーマの抽出・要約はしない</li>
+            <li>NERは固有表現（人名・地名）を抽出するのみで、アクションアイテムのような意味的な要素は抽出できない</li>
+            <li>分類はラベルを返すだけで自然言語の説明を生成しない</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>Temperature パラメータ</h3>
+        <p>
+          LLMの出力のランダム性・多様性を制御するハイパーパラメータ。
+          値が高いほどランダムかつ創造的な出力になり、低いほど決定論的で一貫性のある出力になる。
+        </p>
+        <ul>
+          <li><strong>Temperature = 0（またはそれに近い値）</strong>: 決定論的出力。最も確率の高いトークンのみを選択。事実確認・分類・JSON生成など精度重視タスクに適する</li>
+          <li><strong>Temperature = 0.5</strong>: ランダム性と決定性のバランスを取る中間値。最大の創造性は得られない</li>
+          <li><strong>Temperature ≥ 1.0（高い値）</strong>: ランダム性が増し、多様で創造的な出力。ブレインストーミング・ストーリーテリング・広告コピーなどに適する</li>
+          <li><strong>Temperatureと応答の長さの独立性</strong>: Temperatureはランダム性のみを制御し、応答の長さは制御しない</li>
+          <li><strong>Temperatureと機密データ漏洩の独立性</strong>: Temperatureを下げても機密情報の漏洩は防げない</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「創造的で多様な回答を生成する設定」→ <strong>Temperatureを1.0以上の高い値に上げる</strong>（0に近づけるは逆効果）</li>
+            <li>Temperatureは「ランダム性・創造性」のみに関与。「応答の長さ」「機密データ漏洩防止」「アクセス制御」には無関係</li>
+            <li>法的チャットボットでguardrailを実装する場合、「Temperatureを下げれば不正確な回答を防げる」は誤り → 正解はMetaprompt + 免責事項</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>マルチターン対話とメモリモジュール</h3>
+        <p>
+          チャットボットがマルチターン（複数回のやり取り）の会話を通じてコンテキストを維持するために、
+          過去のインタラクション履歴を保存・参照するモジュール。
+          LLMワークフローに統合されることで、フォローアップクエリへの連続的な対応が可能になる。
+        </p>
+        <ul>
+          <li><strong>メモリモジュール（Memory Module）</strong>: 過去の会話履歴を動的に保存・取得するコンポーネント。LangChainに組み込み機能がある</li>
+          <li><strong>動的な保存と取得</strong>: メモリモジュールの最大の特徴は「リアルタイムで会話履歴を蓄積・参照できる」こと</li>
+          <li><strong>会話履歴の要約</strong>: 履歴を要約して渡す手法もあるが、重要詳細が削除されコンテキスト精度が低下するリスクがある</li>
+          <li><strong>Retrieverとの違い</strong>: Retrieverは外部ドキュメントを検索するが、動的に会話コンテキストを蓄積・保存する機能はない</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「マルチターン対話でコンテキストを維持する不可欠なツール」→ <strong>LLMワークフローに統合されたメモリモジュール</strong></li>
+            <li>Retriever・要約モデル・分類モデルはいずれもコンテキスト保持の代替にはならない</li>
+            <li>Retrieverは外部知識ベースを検索するコンポーネントであり、リアルタイムの会話履歴を動的に蓄積する機能は本質的に持たない</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>マルチステップ推論パイプラインの設計原則</h3>
+        <p>
+          意図識別・情報取得・応答生成などの複数ステップを持つ推論パイプラインを構築する際の設計原則。
+          ツール間の相互運用性とデータのシームレスな受け渡しが品質とスケーラビリティの鍵。
+        </p>
+        <ul>
+          <li><strong>相互運用性（Interoperability）</strong>: 各ツール・コンポーネントが異なるステージ間でデータをシームレスに共有できること。ボトルネックの防止に不可欠</li>
+          <li><strong>ステージ間の接続</strong>: 意図識別 → ドキュメントRetrieval → 応答生成という流れが基本。各ステージの出力が次ステージの入力になる</li>
+          <li><strong>ルールベースシステムの限界</strong>: 事前定義したルールに縛られ、多様なクエリへの適応が困難</li>
+          <li><strong>ツール数の最小化の誤解</strong>: ツールを減らすと複雑さは減るが、マルチステップ推論に必要な機能が失われるリスクがある</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「マルチステップ推論パイプラインの重要な設計原則」→ <strong>ツール間の相互運用性とデータのシームレスな共有</strong></li>
+            <li>「ツール数を最小化する」「ルールベースでドキュメントRetrievalを行う」「Retrievalなしで応答生成に集中する」はいずれも誤り</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>ベクトルデータベース（Vector Store / Vector Search）</h3>
+        <p>
+          テキストや画像などをEmbeddingモデルでベクトル化し、高速な類似度検索を可能にするデータベース。
+          RAGシステムにおけるRetrievalコンポーネントの基盤技術。
+          キーワードマッチングではなく意味（セマンティクス）に基づく検索が特徴。
+        </p>
+        <ul>
+          <li><strong>FAISS（Facebook AI Similarity Search）</strong>: ベクトルインデックスの作成とクエリを高速に処理するライブラリ。低latencyのリアルタイムVector Searchに最適</li>
+          <li><strong>Databricks Vector Search</strong>: DatabricksネイティブのVector Searchソリューション</li>
+          <li><strong>セマンティック検索 vs キーワード検索</strong>: キーワード検索は完全一致が必要で同義語・言い換えを見逃す。セマンティック検索は意味に基づくため表現が異なっても関連ドキュメントを取得できる</li>
+          <li><strong>インデックス化の順序</strong>: Embedding生成 → インデックス保存 → Retriever構築（インデックス化の前にRetrieverをデプロイするのは誤り）</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「法的ドキュメントのRetrieval精度を確保するコンポーネント」→ <strong>セマンティック検索のためのベクトルデータベース</strong></li>
+            <li>「リアルタイムVector Searchに必要なリソース」→ FAISS + 高性能GPU + 分散データベースの3つ</li>
+            <li>LLMをfine-tuningしてもRetrieval精度は上がらない。EmbeddingとベクトルDBの最適化が必要</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>Embeddingモデルの選択と活用</h3>
+        <p>
+          テキストを高次元ベクトルに変換するモデル。ベクトル化されたテキスト間のコサイン類似度などを使って
+          意味的な類似性を測定する。モデル選択の基準はタスク・ドキュメント特性・ドメインによって異なる。
+        </p>
+        <ul>
+          <li><strong>Sentence Transformers</strong>: 文レベルのセマンティック関係のキャプチャに特化。チャットボットの意図識別など文単位の意味理解タスクに最適</li>
+          <li><strong>GloVe / Word2Vec</strong>: 単語レベルのEmbedding。文全体の意味を効果的にキャプチャしないためSemanticタスクには不適</li>
+          <li><strong>BERT-base（分類用）</strong>: 分類タスク向けに設定されており、セマンティック検索用Embeddingの生成には最適化されていない</li>
+          <li><strong>デュアルエンコーダー（Dual Encoder）</strong>: クエリ用とドキュメント用の2つの別々のEncoderを持つ。短いクエリと長いドキュメントの非対称検索に最適</li>
+          <li><strong>ドメイン固有fine-tuning</strong>: 金融・法律・医療テキストでfine-tuningすることで、汎用Embeddingより検索精度が向上する</li>
+          <li><strong>Context Length</strong>: 長い研究論文などの長文書を処理する場合、EmbeddingモデルのContext Lengthが重要な選択基準になる</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「チャットボットクエリから顧客意図を識別・抽出するEmbeddingモデル」→ <strong>Sentence Transformers</strong>（GloVe・Word2Vec・BERT-base分類は不正解）</li>
+            <li>「法的ドキュメントのRAGで検索精度を向上させるEmbedding戦略」→ <strong>ドメイン固有データでfine-tuned Embedding</strong></li>
+            <li>「長い研究論文を処理する検索エンジンのEmbeddingモデル選択基準」→ <strong>Context Length + セマンティック類似度精度</strong></li>
+            <li>「短いクエリと長いドキュメントの非対称検索」→ <strong>デュアルエンコーダー</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>LangChainによるワークフローオーケストレーション</h3>
+        <p>
+          LangChainはLLMを含むマルチステップワークフロー（Chain）を構築するためのフレームワーク。
+          Retriever・Embeddingモデル・LLMなどのコンポーネントをモジュール型ツールで接続し、
+          RAGパイプラインや対話型エージェントを効率的に構築できる。
+        </p>
+        <ul>
+          <li><strong>Chain（チェーン）</strong>: 複数のコンポーネントを順次または条件付きで接続したワークフロー</li>
+          <li><strong>モジュール型ツール</strong>: Retriever・Embedding・LLMを標準インターフェースで接続するコンポーネント群</li>
+          <li><strong>エージェント（Agent）</strong>: ツールを使い分けて複雑なタスクを自律的にこなすLangChainの高度機能</li>
+          <li><strong>プロンプトテンプレート</strong>: 動的なクエリ生成をサポートする組み込み機能</li>
+          <li><strong>LangChainが対応しないこと</strong>: モデルのfine-tuning、出力比較の可視化ツール、計算コスト削減最適化は対象外</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「マルチステップLLMベースワークフローを構築するための最適なライブラリ」→ <strong>LangChain</strong>（PySpark・TensorFlow・Pandasは不正解）</li>
+            <li>「LangChainがRetrievalとLLMの統合に理想的な主な機能」→ <strong>ドキュメントRetrievalと生成機能を組み合わせた構造化ワークフローを作成する能力</strong></li>
+            <li>LangChainはfine-tuningは<strong>しない</strong>。オーケストレーションに特化</li>
+            <li>「メールIDに基づくユーザー詳細抽出チェーンに必要なコンポーネント」→ <strong>retriever + LLM + プロンプトテンプレート</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>System Prompt / Metapromptによるスコープ制御</h3>
+        <p>
+          システムプロンプト（またはMetaprompt）は、アプリケーション全体のLLMの動作方針・制約・スコープをあらかじめ定義する指示文。
+          ユーザーのクエリとは独立して、モデルが「何をすべきか・すべきでないか」を規定する。
+        </p>
+        <ul>
+          <li><strong>システムプロンプトによるスコープ制限</strong>: 「〜に関係のない質問には答えない」などの制約を加え、LLMがスコープ外の回答を出力しないよう制御する</li>
+          <li><strong>Metapromptによる行動規定</strong>: 法的チャットボットに「法的アドバイスを避けて一般情報のみに限定する」「特定の機密情報を出力に含めない」などの指示を組み込む</li>
+          <li><strong>システムプロンプトとデータフィルタリングの違い</strong>: システムプロンプトはLLMの回答範囲を制限するが、ベクトルDB内の無関係なドキュメントを物理的に削除するわけではない</li>
+          <li><strong>単一チャンクへの統合は誤り</strong>: ドキュメントを1つのチャンクに統合すると検索粒度と精度が下がる</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「RAGアプリで無関係な情報に対するフィルタリング手法」→ <strong>システムプロンプトで「関係のない質問には答えない」と明示する</strong></li>
+            <li>「metapromptによるプライベートデータ露出の軽減」→ <strong>特定の機密情報を出力に含めないよう指示する</strong>（temperature調整・応答長短縮は不正解）</li>
+            <li>「不正確な法的アドバイスの防止」のためにスコープを一般情報に限定することができる</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>セーフティフィルターと入力バリデーション</h3>
+        <p>
+          LLMアプリケーションを悪意ある入力（プロンプトインジェクション・システムクラッシュを狙った入力など）から保護するためのメカニズム。
+          入力を受け付ける前に検証・フィルタリングを行うことで安全な動作を確保する。
+        </p>
+        <ul>
+          <li><strong>入力バリデーション</strong>: 許容できないパターンやフォーマットを検出して拒否するルールの実装。システムクラッシュを狙った敵対的入力への防御に有効</li>
+          <li><strong>セーフティフィルター</strong>: 有害・不適切・悪意のある入力を検出し、LLMが処理しないよう遮断するフィルター</li>
+          <li><strong>後処理フィルター</strong>: 生成された出力から機密情報・有害コンテンツを検出して削除するフィルター（後段での防御）</li>
+          <li><strong>プロファニティフィルター</strong>: 不適切な言語をスクリーニングするフィルター。コンテンツの「関連性」向上には寄与しない</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「悪意ある入力から誕生日詩生成アプリを保護する最も効果的な技術」→ <strong>有害な入力を検出するセーフティフィルター + LLMがサポートできないと応答する仕組み</strong></li>
+            <li>「敵対的入力からアプリをクラッシュから守る防御戦略」→ <strong>入力バリデーションルールの実装</strong></li>
+            <li>「プロファニティフィルターは金融ニュースへの関連性向上に役立つか」→ <strong>役立たない</strong>。言語の安全性のみに対処するため、コンテンツの関連性とは無関係</li>
+            <li>セーフティフィルターは「悪意ある入力を特定後に会話を続ける」のではなく、<strong>LLMへの到達を阻止する</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>テキスト要約タスク vs 他タスクの使い分け</h3>
+        <p>
+          テキスト要約（Text Summarization）は長文テキストを主要な情報を保持しつつ短縮するタスク。
+          NER・感情分析・テキスト分類・RAGと比較した際の適用範囲の違いを正確に理解することが試験では繰り返し問われる。
+        </p>
+        <ul>
+          <li><strong>テキスト要約</strong>: 会議議事録・ユーザーレビュー・研究論文・法的ドキュメント等を主要ポイントに凝縮。テーマ・アクションアイテム・決定事項のキャプチャに適する</li>
+          <li><strong>感情分析（Sentiment Analysis）</strong>: テキストの感情的トーン（ポジティブ/ネガティブ/中立）を判断する。共通テーマの抽出や要約はしない</li>
+          <li><strong>固有表現認識（NER）</strong>: 人名・地名・組織名・日付などの固有表現を抽出する。コンテンツの要約やアクションアイテムの特定はしない</li>
+          <li><strong>テキスト分類</strong>: テキストをカテゴリに分類する。会議議事録のサマリーや旅行推薦は生成しない</li>
+          <li><strong>RAG</strong>: 検索と生成を組み合わせてナレッジベースに基づいた応答を生成する。単純な要約より動的な回答生成が必要な場面に適する</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「会議議事録から主要ポイント・アクションアイテム・決定事項を特定」→ <strong>テキスト要約</strong></li>
+            <li>「製品レビューから共通テーマとセンチメントを強調した要約」→ <strong>テキスト要約</strong>（感情分析は不正解 — トーン判断のみで要約はしない）</li>
+            <li>「旅行チャットボット（目的地回答・アクティビティ提案・宿泊推薦）」→ <strong>RAG</strong>（要約・NER・分類は不正解）</li>
+            <li>「ユーザーレビューを分類されたインサイトに変換する（カテゴリ：製品品質・配送・CS）」→ <strong>分類モデル</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="topic">
+        <h3>構造化出力（JSON形式）の生成</h3>
+        <p>
+          LLMに対してJSONなどの構造化フォーマットで出力するよう指示する手法。
+          下流システムがプログラム的に処理できる形式の出力を得るために重要。
+          プロンプト設計における出力仕様の明確化が精度を左右する。
+        </p>
+        <ul>
+          <li><strong>JSON出力指定</strong>: プロンプトに <code>JSON形式で出力してください</code> と記述する。さらにサンプルスキーマを提示することで精度が向上する</li>
+          <li><strong>フィールド指定</strong>: <code>item_name</code>, <code>stock_level</code>, <code>location</code> など必要なフィールドを明示し、不足・余分なフィールドを防ぐ</li>
+          <li><strong>分類ラベル付きJSON</strong>: <code>{"call_id": "123", "label": "In Stock"}</code> 形式でラベルと関連データをセットで出力する</li>
+          <li><strong>後処理との関係</strong>: 後処理（JSON変換など）も有用だが、プロンプトで出力形式を事前に指定することが根本的な解決策</li>
+          <li><strong>PyFuncモデルでの後処理</strong>: MLflow PyFuncモデルの <code>predict</code> 関数内で後処理（JSON変換等）を実装することで、デプロイ時のシームレスなワークフローが確保される</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>「在庫クエリのJSON形式レスポンス生成プロンプト」→ <code>item_name, stock_level, location</code> などのフィールドを<strong>明示的に指定</strong>したプロンプトが正解</li>
+            <li>「コール分類ラベルの高精度JSON出力プロンプト」→ 明確な指示 + JSON形式例の<strong>両方</strong>を含むプロンプトが正解</li>
+            <li>「フォーマットは強制しない」「汎用プロンプト」は不正解。構造化出力には明示的な仕様が必要</li>
+          </ul>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- 4. 理解度チェックシート -->
+    <section class="check-sheet">
+      <h2 class="section-title">理解度チェックシート</h2>
+
+      <div class="check-item">
+        <p class="check-question">Q1. LLMに「注文情報をJSON形式で返してほしい」場合、精度を最大化するプロンプト設計のポイントは何ですか？</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 「JSON形式で返してください」という指示に加えて、<strong>具体的なサンプルスキーマ（例：<code>{"date": "...", "order_id": "..."}</code>）を添付する</strong>。
+            例示がないと、LLMは期待する構造を正確に再現できず、フィールドの不一致や省略が生じる可能性がある。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q2. 旅行チャットボット（目的地・アクティビティ・宿泊を推薦するシステム）に最も適したアーキテクチャはどれですか？ また、テキスト要約が不正解な理由は？</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. <strong>RAG（Retriever + LLM）</strong>。旅行推薦にはナレッジベースからの情報取得と動的な回答生成が必要。
+            テキスト要約は静的なテキスト処理であり、リアルタイムのユーザークエリに対して動的に情報を取得・生成する機能がないため不正解。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q3. Temperatureを高くする（例：1.0以上）と出力はどう変わりますか？ また、Temperatureで制御できないものを2つ挙げてください。</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. Temperatureを高くすると出力の<strong>ランダム性・多様性・創造性</strong>が増す。ブレインストーミングや広告コピーなどに適する。
+            Temperatureで制御できないもの：<strong>①応答の長さ</strong>（明示的な長さ指示が必要）、<strong>②機密情報の漏洩</strong>（後処理フィルターが必要）。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q4. マルチターン対話でコンテキストを維持するために必要なコンポーネントは何ですか？ Retrieverでは代替できない理由は？</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. <strong>LLMワークフローに統合されたメモリモジュール</strong>。Retrieverは外部知識ベース（ドキュメントDB等）を検索するコンポーネントであり、
+            リアルタイムの会話履歴を動的に蓄積・保存する機能を本質的に持たない。
+            メモリモジュールは過去のインタラクション履歴を動的に保存・取得するために設計されている。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q5. チャットボットのクエリから顧客の意図を識別・抽出する場合、GloVeよりSentence Transformersが適している理由を説明してください。</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. GloVeは<strong>単語レベル</strong>のEmbeddingであり、文全体の意味（コンテキスト）を効果的にキャプチャしない。
+            一方、Sentence Transformersは<strong>文レベルのセマンティック関係</strong>のキャプチャに特化しており、
+            「クエリ全体の意図」を理解するタスクに最適。意図識別は文全体の意味理解が必要なため、Sentence Transformersが適切。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q6. RAGパイプラインを正しい順序で構築するとどうなりますか？（4ステップで説明してください）</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① Embeddingモデルを選定しドキュメントのEmbeddingを生成 → ② Vector SearchインデックスにEmbeddingを保存 → ③ Retrieverコンポーネントを構築（インデックスと接続） → ④ 生成モデル（LLM/要約モデル）をデプロイ。
+            Retrieverをインデックス化の前にデプロイするのは誤りで、まずインデックスを作成してからRetrieverを接続する。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q7. System Promptを使って「このアプリはSnoPen AI製品のみを扱う」と設定した場合、無関係な質問への応答をどのように制御できますか？また、この方法の限界は何ですか？</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. System Promptに「この製品に関係のない質問には答えない」と明示することで、LLMのスコープを制限できる。
+            ただし、限界として：System PromptはベクトルDB内の無関係なドキュメントを物理的に削除するわけではない。
+            適切なデータフィルタリングが実行されない場合、無関係なドキュメントがLLMに渡される問題は根本的には解決されない。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q8. LangChainがサポートしない機能を3つ挙げ、それぞれに代わる適切なツール・手法を述べてください。</p>
+        <details>
+          <summary>▼ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ①<strong>モデルのfine-tuning</strong>（LangChainはオーケストレーション専用。fine-tuningは別途モデルトレーニング環境で実施） ②<strong>出力比較の可視化</strong>（MLflowなどの実験管理ツールが担当） ③<strong>計算コスト削減最適化</strong>（インフラレベルの最適化や量子化などの別アプローチが必要）。
+            LangChainの本来の強みは「ドキュメントRetrievalと生成機能を組み合わせた構造化ワークフローの作成」にある。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="cta-exam">
+        <a href="../index.html?tag=Design+Applications" class="cta-btn">✅ この分野の問題を解く</a>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+</body>
+</html>

@@ -6,6 +6,15 @@ let currentQuestionId = null;
 let questionTags = {}; // 問題ごとのタグを保存
 let currentExamType = null; // 'dep' | 'genai'
 
+const tagToLearnPage = {
+    'Application Development': 'learn/application_development.html',
+    'Assembling and Deploying Applications': 'learn/assembling_deploying.html',
+    'Design Applications': 'learn/design_applications.html',
+    'Data Preparation': 'learn/data_preparation.html',
+    'Governance': 'learn/governance.html',
+    'Evaluation and Monitoring': 'learn/evaluation_monitoring.html'
+};
+
 // 試験設定定義
 const EXAM_CONFIG = {
     dep: {
@@ -655,6 +664,10 @@ function showQuestionDetail(uniqueId) {
                         <div class="explanation">
                             ${convertCodeBlocks(question.explanation)}
                         </div>
+                        ${currentExamType === 'genai' && tagToLearnPage[question.domain] ? `
+                        <div class="learn-page-link">
+                            <a href="${tagToLearnPage[question.domain]}" target="_blank">📖 この分野の学習ページへ</a>
+                        </div>` : ''}
                     </div>
                 </div>
             ` : ''}

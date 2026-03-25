@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習ガイド - Databricks Generative AI Associate</title>
+  <link rel="stylesheet" href="_common.css">
+  <style>
+    /* このページ固有のスタイル */
+    body {
+      background: var(--gradient);
+      min-height: 100vh;
+    }
+
+    .top-header {
+      text-align: center;
+      color: white;
+      padding: 56px 24px 40px;
+    }
+
+    .top-header h1 {
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .top-header p {
+      font-size: 1.05em;
+      opacity: 0.88;
+      margin-bottom: 28px;
+    }
+
+    .back-btn-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .top-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    .domain-card {
+      background: rgba(255,255,255,0.97);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-md);
+      transition: all 0.22s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 4px solid var(--primary);
+      cursor: pointer;
+    }
+
+    .domain-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 32px rgba(0,0,0,0.18);
+    }
+
+    .domain-card-icon {
+      font-size: 2.4em;
+      line-height: 1;
+    }
+
+    .domain-card-title {
+      font-size: 1.05em;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.4;
+    }
+
+    .domain-card-desc {
+      font-size: 0.88em;
+      color: var(--text-light);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .domain-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .question-count {
+      font-size: 0.82em;
+      color: white;
+      background: var(--gradient);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .topic-count {
+      font-size: 0.82em;
+      color: var(--text-light);
+    }
+
+    .arrow {
+      font-size: 1.1em;
+      color: var(--primary);
+      font-weight: 700;
+      align-self: flex-end;
+    }
+
+    @media (max-width: 600px) {
+      .top-header h1 { font-size: 1.5em; }
+      .top-card-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <h1>📚 学習ガイド</h1>
+    <p>Databricks Generative AI Associate<br>分野を選んでチートシートを確認しよう</p>
+    <div class="back-btn-wrap">
+      <a href="../index.html" class="back-btn">← 問題を解く</a>
+    </div>
+  </div>
+
+  <div class="top-card-grid">
+
+    <a href="application_development.html" class="domain-card">
+      <div class="domain-card-icon">⚙️</div>
+      <div class="domain-card-title">Application Development</div>
+      <div class="domain-card-desc">
+        プロンプトエンジニアリング・RAG・エージェント・LangChain・MLflow PyFuncなど、GenAIアプリ開発の中核技術を扱う最大分野。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約84問</span>
+        <span class="topic-count">13トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="assembling_deploying.html" class="domain-card">
+      <div class="domain-card-icon">🚀</div>
+      <div class="domain-card-title">Assembling and Deploying Applications</div>
+      <div class="domain-card-desc">
+        MLflow・Unity Catalog・Vector Search・LangChainを用いたデプロイフロー、スケーリング、セキュリティ設定を扱う。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約60問</span>
+        <span class="topic-count">12トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="data_preparation.html" class="domain-card">
+      <div class="domain-card-icon">🗄️</div>
+      <div class="domain-card-title">Data Preparation</div>
+      <div class="domain-card-desc">
+        チャンキング戦略・テキスト抽出・データクリーニング・ベクトルストアへの保存・メタデータ管理など、RAGのデータ基盤を扱う。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約36問</span>
+        <span class="topic-count">12トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="design_applications.html" class="domain-card">
+      <div class="domain-card-icon">🎨</div>
+      <div class="domain-card-title">Design Applications</div>
+      <div class="domain-card-desc">
+        プロンプト設計・RAGアーキテクチャ設計・コンポーネント選択・Temperature・マルチターン対話設計などを扱う。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約40問</span>
+        <span class="topic-count">15トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="evaluation_monitoring.html" class="domain-card">
+      <div class="domain-card-icon">📊</div>
+      <div class="domain-card-title">Evaluation and Monitoring</div>
+      <div class="domain-card-desc">
+        ROUGE・BLEU・Precision/Recall・MLflow Evaluate・Inference Tables・本番モニタリング指標・コスト最適化を扱う。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約26問</span>
+        <span class="topic-count">15トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="governance.html" class="domain-card">
+      <div class="domain-card-icon">🔒</div>
+      <div class="domain-card-title">Governance</div>
+      <div class="domain-card-desc">
+        Guardrail・PII保護・ライセンスコンプライアンス・Unity Catalog / RBAC・セキュリティ設計・バイアス対策を扱う。
+      </div>
+      <div class="domain-card-meta">
+        <span class="question-count">約24問</span>
+        <span class="topic-count">8トピック</span>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+  </div>
+
+</body>
+</html>

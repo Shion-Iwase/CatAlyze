@@ -1,0 +1,473 @@
+/* ============================================================
+   Databricks GenAI Associate - 学習ページ共通スタイル
+   exam_style.css と同じデザイントークンを使用
+   ============================================================ */
+
+/* ---------- リセット & ベース ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary:       #667eea;
+    --primary-dark:  #5568d3;
+    --primary-deep:  #764ba2;
+    --gradient:      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success:       #1a7f37;
+    --success-bg:    #f0f9f4;
+    --danger:        #d73027;
+    --danger-bg:     #fff5f5;
+    --warn:          #f0a500;
+    --warn-bg:       #fffbf0;
+    --text-dark:     #212529;
+    --text-mid:      #495057;
+    --text-light:    #6c757d;
+    --border:        #dee2e6;
+    --border-light:  #e9ecef;
+    --bg-page:       #f4f6fb;
+    --bg-white:      #ffffff;
+    --bg-subtle:     #f8f9fa;
+    --radius-sm:     6px;
+    --radius-md:     10px;
+    --radius-lg:     16px;
+    --shadow-sm:     0 2px 8px rgba(102,126,234,0.10);
+    --shadow-md:     0 4px 20px rgba(102,126,234,0.18);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-dark);
+    line-height: 1.7;
+}
+
+/* ---------- ヘッダー ---------- */
+.learn-header {
+    background: var(--gradient);
+    color: white;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+}
+
+.learn-header h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+}
+
+.learn-header .domain-label {
+    font-size: 0.85em;
+    opacity: 0.85;
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.45);
+    color: white;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.32);
+}
+
+/* ---------- メインレイアウト ---------- */
+.learn-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+/* ---------- 分野概要 ---------- */
+.domain-overview {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    border-left: 5px solid var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.domain-overview p {
+    color: var(--text-mid);
+    font-size: 1.02em;
+    line-height: 1.8;
+}
+
+/* ---------- セクション見出し ---------- */
+.section-title {
+    font-size: 1.35em;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 48px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ---------- 出題内容概要テーブル ---------- */
+.overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+}
+
+.overview-table thead tr {
+    background: var(--gradient);
+    color: white;
+}
+
+.overview-table th {
+    padding: 12px 18px;
+    text-align: left;
+    font-size: 0.9em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.overview-table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.95em;
+    color: var(--text-mid);
+    vertical-align: top;
+}
+
+.overview-table td:first-child {
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+    width: 30%;
+}
+
+.overview-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.overview-table tbody tr:hover td {
+    background: var(--bg-subtle);
+}
+
+/* ---------- トピックセクション ---------- */
+.topic {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    border-top: 4px solid var(--primary);
+}
+
+.topic h3 {
+    font-size: 1.18em;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topic h3::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--gradient);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.topic > p {
+    color: var(--text-mid);
+    margin-bottom: 16px;
+    line-height: 1.8;
+}
+
+.topic ul,
+.topic ol {
+    margin: 10px 0 10px 20px;
+    color: var(--text-mid);
+}
+
+.topic li {
+    margin: 6px 0;
+    line-height: 1.7;
+}
+
+.topic li strong {
+    color: var(--text-dark);
+}
+
+/* トピック内の比較テーブル */
+.topic table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.92em;
+}
+
+.topic table th {
+    background: var(--bg-subtle);
+    padding: 8px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--text-mid);
+}
+
+.topic table td {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    vertical-align: top;
+}
+
+/* ---------- 試験頻出ポイントボックス ---------- */
+.exam-point {
+    background: #eef1fd;
+    border-left: 4px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 18px;
+    margin-top: 18px;
+}
+
+.exam-point strong {
+    display: block;
+    color: var(--primary);
+    font-size: 0.9em;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+}
+
+.exam-point ul {
+    margin: 0 0 0 16px;
+    color: var(--text-mid);
+}
+
+.exam-point li {
+    margin: 4px 0;
+    font-size: 0.95em;
+    line-height: 1.65;
+}
+
+/* ---------- コードブロック ---------- */
+.topic pre[class*="language-"],
+.check-answer pre[class*="language-"] {
+    margin: 14px 0;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+}
+
+.topic code:not([class]),
+.check-answer code:not([class]) {
+    background: var(--bg-subtle);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Consolas, monospace;
+    color: #e83e8c;
+    font-size: 0.9em;
+}
+
+/* ---------- 理解度チェックシート ---------- */
+.check-sheet {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-top: 48px;
+    box-shadow: var(--shadow-sm);
+    border-top: 4px solid var(--warn);
+}
+
+.check-sheet-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.check-sheet-desc {
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 24px;
+}
+
+.check-item {
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 0;
+}
+
+.check-item:last-of-type {
+    border-bottom: none;
+}
+
+.check-question {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.check-item details {
+    margin-top: 6px;
+}
+
+.check-item summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88em;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 5px 12px;
+    background: #eef1fd;
+    border-radius: 20px;
+    list-style: none;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.check-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.check-item summary::before {
+    content: "▶";
+    font-size: 0.75em;
+    transition: transform 0.2s;
+}
+
+.check-item details[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.check-item summary:hover {
+    background: #dde3fa;
+}
+
+.check-answer {
+    margin-top: 14px;
+    padding: 16px 20px;
+    background: var(--success-bg);
+    border-left: 4px solid var(--success);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-mid);
+    font-size: 0.97em;
+    line-height: 1.75;
+    animation: fadeIn 0.2s ease;
+}
+
+.check-answer p {
+    margin: 6px 0;
+}
+
+.check-answer ul {
+    margin: 8px 0 8px 18px;
+}
+
+.check-answer li {
+    margin: 4px 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- CTA：問題を解くボタン ---------- */
+.cta-exam {
+    display: block;
+    width: fit-content;
+    margin: 32px auto 0;
+    padding: 14px 36px;
+    background: var(--gradient);
+    color: white;
+    font-size: 1.05em;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+    transition: all 0.25s;
+}
+
+.cta-exam:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102,126,234,0.5);
+}
+
+/* ---------- スクロールバー ---------- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #888; }
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 768px) {
+    .learn-container {
+        padding: 24px 16px 60px;
+    }
+
+    .learn-header {
+        padding: 14px 20px;
+    }
+
+    .learn-header h1 {
+        font-size: 1.2em;
+    }
+
+    .domain-overview,
+    .topic,
+    .check-sheet {
+        padding: 20px 18px;
+    }
+
+    .topic h3 {
+        font-size: 1.05em;
+    }
+
+    .overview-table td:first-child {
+        width: auto;
+        white-space: normal;
+    }
+
+    .section-title {
+        font-size: 1.15em;
+    }
+}

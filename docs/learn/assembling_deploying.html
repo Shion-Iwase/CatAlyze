@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assembling and Deploying Applications - 学習チートシート</title>
+  <link rel="stylesheet" href="_common.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+
+  <header class="learn-header">
+    <div>
+      <div class="domain-label">Databricks Generative AI Associate</div>
+      <h1>🚀 Assembling and Deploying Applications</h1>
+    </div>
+    <a href="index.html" class="back-btn">← 学習トップ</a>
+    <a href="../index.html" class="back-btn">📝 問題を解く</a>
+  </header>
+
+  <div class="learn-container">
+
+    <!-- 分野概要 -->
+    <div class="domain-overview">
+      <p>
+        MLflow・Unity Catalog・Vector Search・LangChain を使ったデプロイフローや、セキュリティ・スケーリング・コスト最適化を扱う分野。試験全体の約23%（60問）を占める。各コンポーネントの「正しい順序」と「使い分けの判断軸」が頻出。
+      </p>
+    </div>
+
+    <!-- 出題内容概要 -->
+    <h2 class="section-title">📋 出題内容概要</h2>
+    <table class="overview-table">
+      <thead>
+        <tr><th>トピック</th><th>概要</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>MLflow × Unity Catalog × Model Serving</td><td>モデルログ → Unity Catalog 登録 → Serving エンドポイント起動の標準デプロイフロー</td></tr>
+        <tr><td>MLflow PyFunc</td><td>前処理・後処理を predict() に内包してパイプライン全体をカプセル化する仕組み</td></tr>
+        <tr><td>Vector Search / Vector Store</td><td>create_delta_sync_index() による Databricks 管理の embedding 同期と検索インデックス構築</td></tr>
+        <tr><td>LangChain チェーン設計</td><td>PromptTemplate・Retriever・LLM の3点セットによるマルチステップパイプライン</td></tr>
+        <tr><td>RAG パイプライン</td><td>embedding 生成 → インデックス保存 → Retriever → LLM → エンドポイントのデプロイ順序</td></tr>
+        <tr><td>セキュリティ・アクセス制御</td><td>RBAC・暗号化（保存中＋転送中）・環境変数によるシークレット管理</td></tr>
+        <tr><td>スケーラビリティ・インフラ</td><td>Autoscaling による水平スケーリングと GPU ＋ 分散クラウドインフラの必要性</td></tr>
+        <tr><td>モデル選択</td><td>コード生成・高品質・ドメイン特化・多言語対応など用途別の最適モデル選択</td></tr>
+        <tr><td>Unity Catalog</td><td>モデルガバナンス・バージョン管理・アクセス制御の一元化プラットフォーム</td></tr>
+        <tr><td>Inference Logging</td><td>Inference Tables によるリクエスト・レスポンスのネイティブログ記録と監視</td></tr>
+        <tr><td>Feature Serving</td><td>スポーツスコアや株価などリアルタイム動的データを LLM アプリに供給する仕組み</td></tr>
+        <tr><td>トークンベース課金 / コスト最適化</td><td>pay-per-use vs プロビジョニングスループットの使い分けとバッチ・キャッシュによる削減</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 出題内容詳細 -->
+    <h2 class="section-title">📖 出題内容詳細</h2>
+
+    <!-- 1. MLflow × Unity Catalog × Model Serving -->
+    <section class="topic">
+      <h3>MLflow × Unity Catalog × Model Serving — モデルデプロイの基本フロー</h3>
+      <p>Databricks における標準的なモデルデプロイフロー。MLflow でモデルをログし、Unity Catalog に登録した後、Model Serving でエンドポイントを起動する。各ステップが依存関係を持つため、順序が試験で繰り返し問われる。</p>
+      <ul>
+        <li><strong>MLflow log</strong>：<code>mlflow.log_model()</code> でモデル・パラメータ・メトリクスを記録。シグネチャ（入出力スキーマ）も同時に登録するのが推奨</li>
+        <li><strong>Unity Catalog への登録</strong>：<code>mlflow.register_model()</code> でモデルレジストリに登録。メタデータとして <strong>モデル名・バージョン・スキーマ・タグ・説明</strong> を付与</li>
+        <li><strong>Model Serving エンドポイント</strong>：Unity Catalog から登録済みモデルを選択してサービングエンドポイントを作成</li>
+        <li><strong>モデルシグネチャの目的</strong>：latency 削減でも logging 有効化でもなく、「<strong>正しいフォーマットで入力を受け取り出力を返すことの確保</strong>」</li>
+      </ul>
+      <p><strong>正しいデプロイ順序：</strong></p>
+      <ol>
+        <li><code>mlflow.log_model()</code>（シグネチャ付き）</li>
+        <li><code>mlflow.register_model()</code>（Unity Catalog へ名前・バージョン・スキーマ・タグ付き）</li>
+        <li>Model Serving エンドポイント起動</li>
+      </ol>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「MLflow log → Unity Catalog 登録 → Serving」の3ステップの順序が最重要</li>
+          <li>RAG デプロイの最初のステップは <strong>ベクトル embedding の作成</strong>（エンドポイント設定や Unity Catalog 登録より先）</li>
+          <li>「LLM をデプロイしてから embedding を設定する」順序は不正解</li>
+          <li>Unity Catalog の3大メリット：ガバナンス強化・バージョン管理・アクセス制御</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2. MLflow PyFunc -->
+    <section class="topic">
+      <h3>MLflow PyFunc — カスタム前処理・後処理</h3>
+      <p>Python ベースのカスタムモデルクラスを MLflow に統合する仕組み。<code>predict()</code> 関数の中に前処理・推論・後処理を一体化してカプセル化できる。デプロイ後も一貫したデータ変換が保証される。</p>
+      <ul>
+        <li><strong>前処理（preprocessing）</strong>：入力データのクリーニング・正規化・標準化を推論前に実行</li>
+        <li><strong>後処理（postprocessing）</strong>：モデルの生スコアをユーザーフレンドリーなフォーマット（例：「承認」「拒否」）に変換</li>
+        <li><strong><code>predict()</code> 関数</strong>：前処理 → モデル呼び出し → 後処理の3ステップを1つの関数で実装</li>
+      </ul>
+      <p><strong>ワークフロー：</strong>入力受信 → 前処理（クリーニング・正規化） → モデル推論 → 後処理（フォーマット変換） → 出力返却</p>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>PyFunc の有用性：「API コスト最小化」「再トレーニング削減」ではなく、<strong>「推論の前後にデータを変換して互換性と最適化された出力を確保する」</strong></li>
+          <li>前処理だけ・後処理だけでは不完全。両方向の変換が必要</li>
+          <li>「生スコアをそのまま返す」は不正解 → ユーザーが混乱しアクション可能なインサイトが欠如</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. Vector Search -->
+    <section class="topic">
+      <h3>Vector Search / Vector Store — 構築と運用</h3>
+      <p>テキストや画像を高次元ベクトルに変換し、意味的類似度に基づく高速検索を実現するシステム。Databricks では <code>VectorSearchClient</code> の <code>create_delta_sync_index()</code> が Databricks 管理の embedding 同期に使われる。</p>
+      <ul>
+        <li><strong>基本フロー</strong>：ドキュメント前処理 → embedding 生成 → ベクトルストアへ保存 → retriever によるクエリ → 最近傍探索</li>
+        <li><strong><code>create_delta_sync_index()</code></strong>：Delta テーブルと embedding を同期する Databricks の標準 API（<code>create_vector_store()</code> や <code>store_embeddings()</code> は存在しない）</li>
+        <li><strong>FAISS</strong>：外部ベクトルストア。Databricks 管理外の環境で使用</li>
+        <li><strong>距離メトリクス最適化</strong>：コサイン類似度・ユークリッド距離などを最適化することでクエリパフォーマンスが向上</li>
+        <li><strong>高スループット構成</strong>：GPU アクセラレーション ＋ 分散クラウドインフラ ＋ 高性能ベクトルストア DB</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>Databricks 管理の embedding 同期 → <code>create_delta_sync_index()</code> が正解（他の関数名は誤答選択肢）</li>
+          <li>検索精度改善 → セマンティック類似度最適化 retriever ＋ ドメイン固有 embedding モデル（チャンクサイズ増加・ランダムサンプリングは不正解）</li>
+          <li>「retriever を最初に構築する」は不正解 → embedding とインデックスの準備が先</li>
+          <li>CPU のみのローカルサーバーは高スループット要件を処理できない → GPU ＋ 分散クラウドが必要</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4. LangChain -->
+    <section class="topic">
+      <h3>LangChain — チェーン設計とコンポーネント構成</h3>
+      <p>Retriever・LLM・PromptTemplate などのコンポーネントをチェーンとして結合し、複数ステップの処理パイプラインを構築するフレームワーク。RAG・会話チャットボット・QA システムの実装に広く使用される。</p>
+      <ul>
+        <li><strong>必須コンポーネント（基本チェーン）</strong>：PromptTemplate ＋ Retriever ＋ LLM の3点セット</li>
+        <li><strong><code>LLMChain</code></strong>：<code>llm=</code> と <code>prompt=</code> の両方が必須パラメータ</li>
+        <li><strong>会話履歴対応</strong>：Retriever ＋ 会話履歴を含む PromptTemplate ＋ LLM でターン間のコンテキスト保持</li>
+        <li><strong>長いドキュメント対応</strong>：チャンキングでドキュメントを分割し、Retriever で関連チャンクのみ取得してから LLM へ渡す</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>最小構成：Retriever ＋ LLM ＋ PromptTemplate の3点（要約モデルや分類モデルは代替にならない）</li>
+          <li>医療 QA：Retriever（ガイドライン取得）＋ LLM（説明生成）が正解。ルールベース・分類モデルは不正解</li>
+          <li>「ハードコードされたテンプレートで固定応答を返す」は不正解 → 多様なクエリへの柔軟性がない</li>
+          <li>「Retriever なしの embedding だけ使う」は不正解 → 動的な取得・処理ができない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. RAG パイプライン -->
+    <section class="topic">
+      <h3>RAG パイプライン — デプロイ手順と構成要素</h3>
+      <p>外部知識ソースからドキュメントを検索し、LLM の生成に組み込む手法。デプロイには決まった順序があり、embedding 生成・インデックス作成・Retriever 設定・エンドポイントデプロイの順序が試験で繰り返し問われる。</p>
+      <ul>
+        <li><strong>完全デプロイフロー</strong>：依存ライブラリのインストール → ドキュメント前処理・チャンキング → embedding 生成 → Vector Search インデックスへ保存 → Retriever 設定 → Retriever ＋ LLM 統合 → エンドポイントデプロイ</li>
+        <li><strong>ドメイン固有 embedding</strong>：汎用 embedding より精度が高く、法律・医療などの専門領域では必須</li>
+        <li><strong>大規模 RAG の必要インフラ</strong>：コンピューティングパワー ＋ ストレージ ＋ 監視 ＋ 高速ネットワークの4要素</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>RAG デプロイの最初のステップは必ず <strong>ベクトル embedding の作成</strong></li>
+          <li>順序は「embedding 生成 → Vector Search インデックス保存 → Retriever＋LLM 統合 → エンドポイントデプロイ」</li>
+          <li>「LLM を先にデプロイし後で Retriever と embedding を設定」は不正解</li>
+          <li>「Retriever を省略して embedding モデルのみ使用」は不正解 → 精密なドキュメントルックアップに Retriever が不可欠</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. セキュリティ -->
+    <section class="topic">
+      <h3>セキュリティ・アクセス制御 — エンドポイント保護</h3>
+      <p>LLM アプリケーションのデプロイでは、API キー認証・RBAC・保存中と転送中の暗号化の3層が標準的なセキュリティ構成。認証情報は環境変数で渡すのが原則で、コードへの平文埋め込みは厳禁。</p>
+      <ul>
+        <li><strong>RBAC（Role-Based Access Control）</strong>：ユーザーロールに基づいて権限を割り当て、特定機能へのアクセスを制御。マルチユーザー・マルチチームのアプリケーションで必須</li>
+        <li><strong>暗号化</strong>：保存中（at rest）と転送中（in transit）の <strong>両方</strong> でデータを暗号化。どちらか一方だけでは不完全</li>
+        <li><strong>環境変数でのシークレット管理</strong>：API キーや接続文字列はコードに平文で書かず環境変数として渡す</li>
+        <li><strong>エンタープライズコンプライアンス</strong>：Unity Catalog 登録 ＋ 監査ログ（Audit Log）の2点セット</li>
+      </ul>
+      <table>
+        <thead><tr><th>セキュリティ要件</th><th>適切な対策</th></tr></thead>
+        <tbody>
+          <tr><td>マルチユーザーアクセス制御</td><td>RBAC（個別のロールベース権限管理）</td></tr>
+          <tr><td>機密データの保護</td><td>暗号化（保存中 ＋ 転送中の両方）</td></tr>
+          <tr><td>API キーの安全管理</td><td>環境変数（コードへの平文埋め込みは厳禁）</td></tr>
+          <tr><td>エンタープライズ監査</td><td>Unity Catalog 登録 ＋ 監査ログ</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>マルチユーザーアクセス制御の問題では必ず RBAC が正解</li>
+          <li>「共有アクセスキーで全ユーザー認証」は不正解 → 個別の追跡・制御ができない</li>
+          <li>「temperature 設定でアクセス制御」は不正解 → temperature はランダム性に影響するがアクセス制御には無関係</li>
+          <li>パブリックベクトルストアは機密データを含む RAG では不可</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7. スケーラビリティ -->
+    <section class="topic">
+      <h3>スケーラビリティ・インフラ — 高トラフィック対応</h3>
+      <p>LLM アプリケーションのトラフィックは変動的なため、固定リソースではなく Autoscaling による水平スケーリングが推奨される。リアルタイム用途ではリソース確保・レート制限管理・latency 監視の3点を常に考慮する。</p>
+      <ul>
+        <li><strong>Autoscaling（水平スケーリング）</strong>：変動するワークロードに応じてコンピューティングリソースを動的に調整。API 使用量が急増する場合の最適解</li>
+        <li><strong>固定リソースの問題点</strong>：ピーク需要に合わせた固定リソースは低需要時に過少利用、高需要時に過負荷を招く</li>
+        <li><strong>GPU アクセラレーション</strong>：LLM 推論と embedding 処理には GPU が必要。CPU のみでは高スループット要件を満たせない</li>
+        <li><strong>リアルタイムサービングの3要件</strong>：十分なコンピューティングリソース確保 ＋ API レート制限管理 ＋ latency 監視</li>
+        <li><strong>レート制限（Rate Limiting）</strong>：流量制御であり、スケーリングとは別物。レート制限のみではスケーラビリティが向上しない</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>変動ワークロードへの対応 → Autoscaling ポリシーによる水平スケーリング（固定リソース・レート制限のみは不正解）</li>
+          <li>高スループットインフラ → GPU ＋ ストレージ最適化を備えた分散クラウドインフラ（CPU ローカル・単一インスタンスは不正解）</li>
+          <li>「context length を短縮してコスト節約」は不正解 → 応答品質が低下しスケーラビリティにも対処しない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. モデル選択 -->
+    <section class="topic">
+      <h3>モデル選択 — ユースケース別の最適解</h3>
+      <p>タスクやコスト・品質要件に応じて最適なモデルを選択する判断軸が問われる。コード生成・高品質オンプレミス・ドメイン特化・多言語対応など、各ユースケースに対応した推奨モデルまたはアプローチが存在する。</p>
+      <table>
+        <thead><tr><th>ユースケース</th><th>最適なモデル／アプローチ</th></tr></thead>
+        <tbody>
+          <tr><td>コード生成・デバッグ</td><td>CodeLlama-34B（コード特化モデル）</td></tr>
+          <tr><td>高品質 ＋ サードパーティ API 不使用（オンプレミス）</td><td>Llama2-70B</td></tr>
+          <tr><td>コスト効率優先 ＋ ドメイン特化</td><td>小型ファインチューニング済みモデル ＋ クエリキャッシュ</td></tr>
+          <tr><td>多言語チャットボット</td><td>多言語パフォーマンスベンチマークスコアを優先</td></tr>
+          <tr><td>コスト・latency 最小化（512 トークンチャンク）</td><td>Context Length 512 ＋ モデルサイズ 0.13GB ＋ 次元 384</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>コード生成 → CodeLlama-34B が正解（汎用 LLM は不正解）</li>
+          <li>コスト効率 → ドメイン特化小型 LLM ＋ キャッシュ（最大モデルは不正解）</li>
+          <li>多言語 → 多言語ベンチマークスコアが最重要（モデルサイズや latency は二次的）</li>
+          <li>「latency 優先なのに 14GB・4096 次元 embedding を選ぶ」は不正解 → コスト・latency の優先事項に矛盾</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9. Unity Catalog -->
+    <section class="topic">
+      <h3>Unity Catalog — モデル管理・ガバナンス</h3>
+      <p>Databricks の中央集権型データ・AI ガバナンスプラットフォーム。モデルのバージョン管理・アクセス制御・監査ログ・メタデータ管理を一元化する。MLflow のモデルレジストリと統合されエンタープライズグレードのモデル管理が可能。</p>
+      <ul>
+        <li><strong>3大メリット</strong>：ガバナンス強化・バージョン管理・アクセス制御</li>
+        <li><strong>登録時のメタデータ</strong>：モデル名・バージョン・スキーマ（入出力定義）・タグ・説明</li>
+        <li><strong>監査ログ（Audit Log）</strong>：エンドポイントのクエリと応答を追跡し、コンプライアンスとトラブルシューティングを支援</li>
+        <li><strong>エンタープライズ RAG のコンプライアンス</strong>：Unity Catalog 登録 ＋ 監査ログの2点セット</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「Unity Catalog 登録はリアルタイムロギングを有効化する」は不正解 → リアルタイムロギングは Inference Tables の機能</li>
+          <li>「メタデータ設定をスキップしてデプロイ」は不正解 → ガバナンス追跡に不可欠なメタデータを省略すべきでない</li>
+          <li>「コスト削減のためにパブリックベクトルストアを使用」は不正解 → データセキュリティとコンプライアンスを損なう</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10. Inference Logging -->
+    <section class="topic">
+      <h3>Inference Logging / 推論監視</h3>
+      <p>デプロイ済み LLM アプリケーションの品質・コスト・パフォーマンスを継続的に監視するためのログ記録機能。Databricks では <strong>Inference Tables</strong> がネイティブのリクエスト・レスポンスログ記録機能として提供されている。</p>
+      <ul>
+        <li><strong>Inference Tables</strong>：Databricks のネイティブ機能。マイクロサービスによるカスタムログの代替として使用可能</li>
+        <li><strong>監視対象</strong>：クエリパターン・応答時間（latency）・エラー発生状況・トークン使用量</li>
+        <li><strong>コスト最適化の3点セット</strong>：動的 GPU スケーリング ＋ トークン使用量監視 ＋ Inference Logging</li>
+      </ul>
+      <table>
+        <thead><tr><th>ツール</th><th>用途</th><th>Inference Log 記録に適しているか</th></tr></thead>
+        <tbody>
+          <tr><td>Inference Tables</td><td>推論リクエスト・レスポンスのログ記録・監視</td><td>✅ 適切</td></tr>
+          <tr><td>Lakeview</td><td>Delta Lake の監視</td><td>❌ 不適（用途が異なる）</td></tr>
+          <tr><td>DBSQL</td><td>データクエリ</td><td>❌ 不適（ログ記録機能ではない）</td></tr>
+          <tr><td>Vector Search</td><td>セマンティック検索</td><td>❌ 不適（用途が異なる）</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>Databricks ネイティブのログ記録機能 → Inference Tables（マイクロサービスの代替）</li>
+          <li>「LLM ファインチューニングでスループット・コストを改善する」は不正解 → ファインチューニングはスケーラビリティコストに直接対処しない</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11. Feature Serving -->
+    <section class="topic">
+      <h3>Feature Serving — リアルタイムデータアクセス</h3>
+      <p>LLM アプリケーションにリアルタイムデータへのアクセスを提供するコンポーネント。事前計算された静的な embedding や知識ベースだけでは対応できない、刻々と変わるライブデータ（スポーツスコア・在庫状況・株価など）を LLM に供給するために使用する。</p>
+      <ul>
+        <li><strong>主要用途</strong>：リアルタイム更新が必要なデータ（スポーツスコア・スポーツ統計・在庫・株価）を LLM アプリに供給</li>
+        <li><strong>静的知識との違い</strong>：通常の RAG は過去のドキュメントを索引化した静的な知識を使う。Feature Serving はリアルタイムの動的データにアクセスできる</li>
+      </ul>
+      <table>
+        <thead><tr><th>コンポーネント</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>Feature Serving</td><td>リアルタイム数値データ・特徴量の供給（スポーツスコア・株価など）</td></tr>
+          <tr><td>Vector Search</td><td>ドキュメントの意味的検索（静的な知識ベース）</td></tr>
+          <tr><td>ファインチューニング</td><td>モデルのパラメータ更新（リアルタイムデータ供給とは別物）</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「ライブスポーツスコアを表示する LLM アプリ」→ Feature Serving が正解</li>
+          <li>「Vector Search でリアルタイムスポーツスコアを提供」は不正解 → Vector Search はドキュメント意味検索用</li>
+          <li>「モデルをリアルタイムデータでファインチューニングする」は不正解 → 都度リアルタイム更新には非現実的</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12. コスト最適化 -->
+    <section class="topic">
+      <h3>トークンベース課金 / コスト最適化</h3>
+      <p>LLM アプリケーションのコストはトークン使用量・コンピューティングリソース・リクエスト数に依存する。リクエスト量が少ない場合はトークンベース（pay-per-use）が有利で、リクエスト量が多い場合はプロビジョニングスループットが経済的になる。</p>
+      <ul>
+        <li><strong>トークンベース（pay-per-use）</strong>：リクエスト数が少ない場合に cost-efficient。固定コストなし</li>
+        <li><strong>プロビジョニングスループット</strong>：高トラフィック・高スループット環境向け。一定のキャパシティを確保</li>
+        <li><strong>バッチ処理</strong>：複数クエリをまとめて送信して API コールを削減</li>
+        <li><strong>キャッシュ</strong>：頻繁なクエリをキャッシュして重複計算を避け、latency とコストを削減</li>
+        <li><strong>小型ファインチューニング済みモデル</strong>：大型汎用モデルの代わりにドメイン特化の小型モデルを使用</li>
+      </ul>
+      <table>
+        <thead><tr><th>状況</th><th>最適な課金・構成</th></tr></thead>
+        <tbody>
+          <tr><td>リクエスト数が少ない</td><td>トークンベース（pay-per-use）</td></tr>
+          <tr><td>高スループット・高トラフィック</td><td>プロビジョニングスループット</td></tr>
+          <tr><td>コスト優先の embedding 設定</td><td>Context Length 512 ＋ モデルサイズ 0.13GB ＋ 次元 384</td></tr>
+        </tbody>
+      </table>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>「リクエストが少ないのにプロビジョニングスループットを選ぶ」は不正解 → 過剰投資</li>
+          <li>コスト最適化の3点セット：動的 GPU スケーリング ＋ トークン使用量監視 ＋ Inference Logging</li>
+          <li>「最大の事前学習済みモデルを使う（コスト効率を優先する場面で）」は不正解 → ドメイン特化用途では過剰</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 理解度チェックシート -->
+    <div class="check-sheet">
+      <div class="check-sheet-title">✅ 理解度チェックシート</div>
+      <p class="check-sheet-desc">答えを考えてから「▶ 答えを見る」を開いてください</p>
+
+      <div class="check-item">
+        <p class="check-question">Q1. Databricks でのモデルデプロイの正しい3ステップの順序を答えてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① <code>mlflow.log_model()</code>（シグネチャ付き）→ ② <code>mlflow.register_model()</code>（Unity Catalog へ名前・バージョン・スキーマ・タグ付き）→ ③ Model Serving エンドポイント起動。LLM をデプロイしてから embedding を設定する順序は不正解。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q2. MLflow PyFunc の predict() 関数に含める3つの処理を答えてください。また、生スコアをそのまま返してはいけない理由は？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. ① 前処理（入力データのクリーニング・正規化）→ ② モデル推論 → ③ 後処理（ユーザーフレンドリーなフォーマット変換）の3つ。生スコアをそのまま返してはいけない理由：ユーザーが混乱し、アクション可能なインサイトが欠如するため（例：0.87 というスコアより「承認」と返すべき）。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q3. Databricks Vector Search で Delta テーブルと embedding を同期するための正しい API は何ですか？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. <code>create_delta_sync_index()</code>。試験では <code>create_vector_store()</code> や <code>store_embeddings()</code> などの存在しない関数名が誤答選択肢として登場するので注意。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q4. マルチユーザー環境でエンドポイントへのアクセス制御を実装する場合、何が正しい方法ですか？「共有アクセスキーで全ユーザーを認証する」が不正解な理由も答えてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 正しい方法は RBAC（ロールベースアクセス制御）。共有アクセスキーが不正解な理由：全ユーザーが同一キーを使うため、個別のアクセス追跡・権限制御ができない。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q5. 変動するトラフィックに対応するためのスケーラビリティ対策として何が正しいですか？「レート制限の実装だけで対応する」が不正解な理由も答えてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. 正しい対策は Autoscaling ポリシーによる水平スケーリング。レート制限だけが不正解な理由：レート制限はリクエストの流量を制御するだけであり、コンピューティングリソース自体のスケーリングは行わないため、高トラフィック時にシステムが過負荷になる。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q6. Databricks でデプロイ済みモデルのリクエスト・レスポンスをログ記録するためのネイティブ機能は何ですか？Lakeview や DBSQL が不正解な理由も答えてください。</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. Inference Tables が正解。Lakeview が不正解な理由：Delta Lake の監視用ツールであり、推論ログ記録機能ではない。DBSQL が不正解な理由：データクエリ用ツールであり、ログ記録機能ではない。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q7. リアルタイムのスポーツスコアを表示する LLM アプリを構築する場合、Vector Search と Feature Serving のどちらを使うべきですか？その理由は？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. Feature Serving が正解。理由：Vector Search は過去のドキュメントを索引化した静的な知識ベースへのセマンティック検索用であり、刻々と変わるリアルタイムデータへのアクセスには対応できない。Feature Serving はリアルタイムの動的データ（スポーツスコア・株価・在庫など）を LLM アプリに供給するために設計されている。</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="check-item">
+        <p class="check-question">Q8. Unity Catalog にモデルを登録する際に付与するべきメタデータを4つ挙げてください。また Unity Catalog の3大メリットは何ですか？</p>
+        <details>
+          <summary>▶ 答えを見る</summary>
+          <div class="check-answer">
+            <p>A. メタデータ：モデル名・バージョン・スキーマ（入出力定義）・タグ（説明も含む）。Unity Catalog の3大メリット：ガバナンス強化・バージョン管理・アクセス制御。</p>
+          </div>
+        </details>
+      </div>
+
+      <a href="../index.html?exam=genai" class="cta-exam">📝 この分野の問題を解く</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>

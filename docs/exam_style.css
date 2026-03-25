@@ -894,6 +894,29 @@ code[class*="language-"] {
     font-weight: 700;
 }
 
+.learn-page-link {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #e9ecef;
+}
+
+.learn-page-link a {
+    display: inline-block;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid #667eea;
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+.learn-page-link a:hover {
+    background: #667eea;
+    color: white;
+}
+
 /* スクロールバーのスタイル */
 .questions-list::-webkit-scrollbar,
 .question-detail::-webkit-scrollbar {
@@ -1247,6 +1270,34 @@ code[class*="language-"] {
     font-size: 0.9em;
     opacity: 0.82;
     line-height: 1.6;
+}
+
+/* 学習ページへのリンク（試験選択画面） */
+.exam-selection-learn {
+    margin-top: 32px;
+}
+
+.exam-learn-btn {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.5);
+    color: white;
+    text-decoration: none;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.22s;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    letter-spacing: 0.02em;
+}
+
+.exam-learn-btn:hover {
+    background: rgba(255,255,255,0.28);
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
 
 /* 試験切替ボタン（ヘッダー内） */
