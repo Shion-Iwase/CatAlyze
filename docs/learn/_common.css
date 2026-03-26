@@ -100,6 +100,156 @@ body {
     padding: 40px 24px 80px;
 }
 
+/* ---------- アウトライン（目次サイドバー） ---------- */
+.outline {
+    position: fixed;
+    top: 80px;
+    right: max(16px, calc((100vw - 900px) / 2 - 280px));
+    width: 240px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 0;
+    z-index: 50;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.outline-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.82em;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: 0.04em;
+    z-index: 1;
+}
+
+.outline-close {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.1em;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.outline-close:hover {
+    background: var(--bg-subtle);
+    color: var(--text-dark);
+}
+
+.outline-nav {
+    padding: 8px 12px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.outline-nav a {
+    display: block;
+    padding: 5px 10px;
+    font-size: 0.78em;
+    color: var(--text-light);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    border-radius: 0 4px 4px 0;
+    line-height: 1.5;
+    transition: all 0.15s;
+    word-break: break-word;
+}
+
+.outline-nav a.outline-h2 {
+    font-weight: 700;
+    color: var(--text-mid);
+    margin-top: 8px;
+    padding-left: 10px;
+}
+
+.outline-nav a.outline-h3 {
+    padding-left: 18px;
+    font-size: 0.75em;
+}
+
+.outline-nav a:hover {
+    color: var(--primary);
+    background: #f5f7ff;
+}
+
+.outline-nav a.active {
+    color: var(--primary);
+    border-left-color: var(--primary);
+    background: #eef1fd;
+    font-weight: 600;
+}
+
+/* モバイル用トグルボタン */
+.outline-toggle {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gradient);
+    color: white;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+    z-index: 60;
+    transition: transform 0.2s;
+    align-items: center;
+    justify-content: center;
+}
+
+.outline-toggle:hover {
+    transform: scale(1.08);
+}
+
+/* 画面幅が狭い場合はアウトライン非表示（右余白がない場合） */
+@media (max-width: 1340px) {
+    .outline {
+        display: none;
+    }
+    .outline-toggle {
+        display: flex;
+    }
+    /* モバイル: オーバーレイとして開く */
+    .outline.open {
+        display: block;
+        position: fixed;
+        top: auto;
+        bottom: 80px;
+        right: 16px;
+        left: auto;
+        width: min(300px, calc(100vw - 32px));
+        max-height: 60vh;
+        animation: outlineSlideUp 0.25s ease;
+    }
+    .outline.open .outline-close {
+        display: block;
+    }
+}
+
+@keyframes outlineSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* アウトライン用スクロールバー */
+.outline::-webkit-scrollbar { width: 4px; }
+.outline::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
 /* ---------- 分野概要 ---------- */
 .domain-overview {
     background: var(--bg-white);
@@ -357,6 +507,7 @@ body {
     background: #eef1fd;
     border-radius: 20px;
     list-style: none;
+    -webkit-user-select: none;
     user-select: none;
     transition: background 0.2s;
 }
@@ -406,6 +557,130 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 全体像チャプター ---------- */
+.domain-map {
+    background: linear-gradient(135deg, #f5f7ff 0%, #eef1fd 100%);
+    border: 1px solid #d8dffa;
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 0;
+}
+
+.domain-map-story {
+    background: var(--bg-white);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    color: var(--text-mid);
+    font-size: 0.97em;
+    line-height: 1.75;
+}
+
+.domain-map h3 {
+    font-size: 0.9em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+/* フロー図 */
+.domain-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 24px;
+}
+
+.flow-step {
+    background: var(--bg-white);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--primary);
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.flow-step.flow-sub {
+    border-style: dashed;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.flow-arrow {
+    color: var(--primary);
+    font-size: 1.1em;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* クラスターグリッド */
+.domain-clusters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.cluster {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    border-left: 4px solid var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.cluster-title {
+    font-size: 0.82em;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cluster-items {
+    font-size: 0.8em;
+    color: var(--text-light);
+    line-height: 1.8;
+}
+
+.cluster-items li {
+    list-style: none;
+    padding-left: 10px;
+    position: relative;
+}
+
+.cluster-items li::before {
+    content: "·";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .domain-map {
+        padding: 20px 18px;
+    }
+    .domain-clusters {
+        grid-template-columns: 1fr 1fr;
+    }
+    .domain-flow {
+        gap: 4px;
+    }
+    .flow-step {
+        font-size: 0.78em;
+        padding: 6px 10px;
+    }
 }
 
 /* ---------- CTA：問題を解くボタン ---------- */

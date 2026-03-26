@@ -50,10 +50,68 @@
       </tbody>
     </table>
 
+    <!-- 全体像 -->
+    <section>
+      <h2 class="section-title">全体像とトピックのつながり</h2>
+      <div class="domain-map">
+        <div class="domain-map-story">
+          GenAIアプリ開発は3つの軸で成り立つ。①<strong>入力設計</strong>：プロンプトエンジニアリングでLLMへの指示を最適化する。②<strong>知識拡張</strong>：RAGとEmbeddingで外部知識をLLMに注入する。③<strong>ツール統合</strong>：LangChainで複数コンポーネントをつなぎ、MLflow PyFuncでデプロイ可能な形に仕上げる。ガードレールやコスト最適化はこれら3軸全体に横断的に関わる。
+        </div>
+        <h3>主要フロー</h3>
+        <div class="domain-flow">
+          <span class="flow-step">プロンプト設計</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">RAGアーキテクチャ</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">LangChain統合</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">MLflow PyFunc</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">デプロイ・運用</span>
+        </div>
+        <h3>トピック群</h3>
+        <div class="domain-clusters">
+          <div class="cluster">
+            <div class="cluster-title">✍️ 入力制御</div>
+            <ul class="cluster-items">
+              <li>プロンプトエンジニアリング（zero/few/CoT）</li>
+              <li>マルチターン対話とメモリ</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">🔍 知識拡張</div>
+            <ul class="cluster-items">
+              <li>RAGアーキテクチャ</li>
+              <li>Embeddingモデル選択</li>
+              <li>チャンキング戦略</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">⚙️ ツール統合</div>
+            <ul class="cluster-items">
+              <li>LangChain</li>
+              <li>MLflow PyFunc</li>
+              <li>エージェント設計</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">🛡️ 品質・制御</div>
+            <ul class="cluster-items">
+              <li>ガードレール</li>
+              <li>評価指標</li>
+              <li>コスト最適化</li>
+              <li>ファインチューニング</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 出題内容詳細 -->
     <h2 class="section-title">📖 出題内容詳細</h2>
 
-    <!-- 1. プロンプトエンジニアリング -->
+
+<!-- 1. プロンプトエンジニアリング -->
     <section class="topic">
       <h3>プロンプトエンジニアリング</h3>
       <p>LLMから望ましい出力を引き出すために入力テキスト（プロンプト）を設計・最適化する技術。明示的な指示・出力フォーマット指定・few-shot examples・コンテキストの追加が主な手法。汎用的な指示では一貫性が下がるため、具体的な指示と例の組み合わせが重要。</p>
@@ -75,7 +133,26 @@
       </div>
     </section>
 
-    <!-- 2. RAGアーキテクチャ -->
+<!-- 4. マルチターン対話 -->
+    <section class="topic">
+      <h3>マルチターン対話・ステートトラッキング</h3>
+      <p>複数のやり取りを通じてコンテキストを維持しながら会話を続けるシステム。各ターンで過去の会話内容を記憶・参照するステートトラッキング（メモリ）の実装が品質の鍵。</p>
+      <ul>
+        <li><strong>ステートトラッキング</strong>：以前の対話ターンのコンテキストを保持するメカニズム</li>
+        <li><strong>メモリ</strong>：ターンをまたいでユーザーコンテキストを保存する仕組み</li>
+        <li><strong>コンテキストリセットの問題</strong>：各ターン後にリセットすると断片的・不一貫な会話になる</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>チャットボットが以前のターンを忘れる問題 → ステートトラッキング（メモリ）の実装が解決策</li>
+          <li>「tokenの上限を増やす」は不正解 → 入力サイズに影響するがコンテキスト保持とは別の問題</li>
+          <li>「temperatureを下げる」は不正解 → ランダム性に影響するがコンテキスト記憶とは無関係</li>
+        </ul>
+      </div>
+    </section>
+
+<!-- 2. RAGアーキテクチャ -->
     <section class="topic">
       <h3>RAGアーキテクチャとパイプライン設計</h3>
       <p>RAG（Retrieval-Augmented Generation）は、LLMの生成とベクトルストアからの文書検索を組み合わせたアーキテクチャ。モデルの知識限界を補い、最新情報・専門知識に基づいた回答生成を可能にする。ハルシネーション（幻覚）防止に最も有効な手法。</p>
@@ -105,7 +182,7 @@
       </div>
     </section>
 
-    <!-- 3. Embeddingモデル -->
+<!-- 3. Embeddingモデル -->
     <section class="topic">
       <h3>Embeddingモデル選択と最適化</h3>
       <p>Embeddingモデルはテキストを高次元ベクトルに変換し、意味的類似度に基づいた検索・推薦を可能にする。ユースケースに応じて選択すべき特性（Context Length・次元数・ドメイン特化度）が異なる。</p>
@@ -135,90 +212,7 @@
       </div>
     </section>
 
-    <!-- 4. マルチターン対話 -->
-    <section class="topic">
-      <h3>マルチターン対話・ステートトラッキング</h3>
-      <p>複数のやり取りを通じてコンテキストを維持しながら会話を続けるシステム。各ターンで過去の会話内容を記憶・参照するステートトラッキング（メモリ）の実装が品質の鍵。</p>
-      <ul>
-        <li><strong>ステートトラッキング</strong>：以前の対話ターンのコンテキストを保持するメカニズム</li>
-        <li><strong>メモリ</strong>：ターンをまたいでユーザーコンテキストを保存する仕組み</li>
-        <li><strong>コンテキストリセットの問題</strong>：各ターン後にリセットすると断片的・不一貫な会話になる</li>
-      </ul>
-      <div class="exam-point">
-        <strong>試験頻出ポイント</strong>
-        <ul>
-          <li>チャットボットが以前のターンを忘れる問題 → ステートトラッキング（メモリ）の実装が解決策</li>
-          <li>「tokenの上限を増やす」は不正解 → 入力サイズに影響するがコンテキスト保持とは別の問題</li>
-          <li>「temperatureを下げる」は不正解 → ランダム性に影響するがコンテキスト記憶とは無関係</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 5. LangChain -->
-    <section class="topic">
-      <h3>LangChainとチェーン設計</h3>
-      <p>LLMを使ったマルチステップのワークフロー（チェーン）を構築するフレームワーク。入力処理・検索・生成を統合した複雑なパイプラインを、複数コンポーネントの連結で実現する。</p>
-      <ul>
-        <li><strong>LLMChain</strong>：PromptTemplate ＋ LLMを連結した基本的なチェーン</li>
-        <li><strong>Retriever</strong>：ベクトルストアからドキュメントを検索するコンポーネント</li>
-        <li><strong>PromptTemplate</strong>：ユーザー入力を構造化するためのテンプレート</li>
-        <li><strong>標準構成</strong>：PromptTemplate ＋ Retriever ＋ LLMの3点セット</li>
-        <li><strong>相互運用性</strong>：マルチステップ推論ではステージ間でデータをシームレスに共有することが重要</li>
-      </ul>
-      <div class="exam-point">
-        <strong>試験頻出ポイント</strong>
-        <ul>
-          <li>チェーンに含めるべき標準コンポーネント：PromptTemplate ＋ Retriever ＋ LLM</li>
-          <li>「ハードコードされたテンプレート」は不正解 → 多様なクエリへの柔軟性がない</li>
-          <li>「Retrieverなしのembedding」は不正解 → embeddingだけでは動的な検索ができない</li>
-          <li>「要約モデルを追加」は不正解 → 重要な詳細を削除し応答品質を低下させる</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 6. MLflow PyFunc -->
-    <section class="topic">
-      <h3>MLflow PyFuncモデル</h3>
-      <p>Pythonで書いた任意のモデルをMLflowのシリアライズ形式でラップし、前処理・後処理を含むパイプライン全体をカプセル化するインターフェース。デプロイ時に入出力の互換性と一貫性を確保する。</p>
-      <ul>
-        <li><strong>前処理（Preprocessing）</strong>：モデル入力前にデータをクリーニング・標準化・変換</li>
-        <li><strong>後処理（Postprocessing）</strong>：モデル出力を人間が読めるフォーマットに変換（例：スコア → 「承認」「拒否」）</li>
-        <li><strong>predict関数</strong>：PyFuncモデルのコアとなるメソッド。前処理・推論・後処理を内包</li>
-        <li><strong>Unity Catalogへの登録</strong>：モデルガバナンス・バージョン管理・アクセス制御のため</li>
-      </ul>
-      <p><strong>ワークフロー：</strong>入力前処理 → MLflow PyFunc予測 → 出力後処理（ユーザーフレンドリーなフォーマット）</p>
-      <div class="exam-point">
-        <strong>試験頻出ポイント</strong>
-        <ul>
-          <li>PyFuncが有用な理由：推論の前後にデータを変換でき互換性と最適化された出力を確保（APIコスト最小化・再トレーニング削減ではない）</li>
-          <li>「後処理なしに前処理のみ」は不正解 → 後処理はモデル出力を解釈可能にするために不可欠</li>
-          <li>「生の入力を直接モデルに渡す」は不正解 → 前処理でデータ品質を確保し予測信頼性を向上させる</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 7. ガードレール -->
-    <section class="topic">
-      <h3>ガードレール・セーフティフィルター</h3>
-      <p>LLMアプリケーションの出力が安全・正確であり、アプリケーション要件に沿っていることを確保するための制御機構。ハルシネーション・有害応答・プライバシー侵害などのリスクを軽減する。</p>
-      <ul>
-        <li><strong>metapromptによるガードレール</strong>：機密情報を出力しないよう指示するルールをシステムプロンプトで定義</li>
-        <li><strong>入力サニタイズ</strong>：特殊文字の削除とデータ形式検証によるインジェクション攻撃防止</li>
-        <li><strong>コンテンツフィルタリング</strong>：安全でない・有害な応答を除外する事前定義フィルター</li>
-        <li><strong>Retrievalベース拡張</strong>：検索した情報で応答を根拠づけ不正確な生成を防止</li>
-      </ul>
-      <div class="exam-point">
-        <strong>試験頻出ポイント</strong>
-        <ul>
-          <li>ガードレールの目的：latency削減・多様性向上ではなく、安全・正確・アプリ要件整合の確保</li>
-          <li>インジェクション攻撃防止 → 入力サニタイズ（特殊文字削除 ＋ データ形式検証）</li>
-          <li>「temperatureを下げれば安全になる」は不正解 → temperatureは安全性に影響しない</li>
-          <li>「監視・ログだけで十分」は不正解 → 悪意ある入力の実行を防がない</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 8. チャンキング -->
+<!-- 8. チャンキング -->
     <section class="topic">
       <h3>コンテキスト長とチャンキング戦略</h3>
       <p>LLMやEmbeddingモデルにはトークン制限（Context Length）があるため、長いドキュメントは適切なサイズに分割（チャンキング）して処理する。チャンキング戦略の選択は検索精度・要約品質に直接影響する。</p>
@@ -247,7 +241,50 @@
       </div>
     </section>
 
-    <!-- 9. エージェント -->
+<!-- 5. LangChain -->
+    <section class="topic">
+      <h3>LangChainとチェーン設計</h3>
+      <p>LLMを使ったマルチステップのワークフロー（チェーン）を構築するフレームワーク。入力処理・検索・生成を統合した複雑なパイプラインを、複数コンポーネントの連結で実現する。</p>
+      <ul>
+        <li><strong>LLMChain</strong>：PromptTemplate ＋ LLMを連結した基本的なチェーン</li>
+        <li><strong>Retriever</strong>：ベクトルストアからドキュメントを検索するコンポーネント</li>
+        <li><strong>PromptTemplate</strong>：ユーザー入力を構造化するためのテンプレート</li>
+        <li><strong>標準構成</strong>：PromptTemplate ＋ Retriever ＋ LLMの3点セット</li>
+        <li><strong>相互運用性</strong>：マルチステップ推論ではステージ間でデータをシームレスに共有することが重要</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>チェーンに含めるべき標準コンポーネント：PromptTemplate ＋ Retriever ＋ LLM</li>
+          <li>「ハードコードされたテンプレート」は不正解 → 多様なクエリへの柔軟性がない</li>
+          <li>「Retrieverなしのembedding」は不正解 → embeddingだけでは動的な検索ができない</li>
+          <li>「要約モデルを追加」は不正解 → 重要な詳細を削除し応答品質を低下させる</li>
+        </ul>
+      </div>
+    </section>
+
+<!-- 6. MLflow PyFunc -->
+    <section class="topic">
+      <h3>MLflow PyFuncモデル</h3>
+      <p>Pythonで書いた任意のモデルをMLflowのシリアライズ形式でラップし、前処理・後処理を含むパイプライン全体をカプセル化するインターフェース。デプロイ時に入出力の互換性と一貫性を確保する。</p>
+      <ul>
+        <li><strong>前処理（Preprocessing）</strong>：モデル入力前にデータをクリーニング・標準化・変換</li>
+        <li><strong>後処理（Postprocessing）</strong>：モデル出力を人間が読めるフォーマットに変換（例：スコア → 「承認」「拒否」）</li>
+        <li><strong>predict関数</strong>：PyFuncモデルのコアとなるメソッド。前処理・推論・後処理を内包</li>
+        <li><strong>Unity Catalogへの登録</strong>：モデルガバナンス・バージョン管理・アクセス制御のため</li>
+      </ul>
+      <p><strong>ワークフロー：</strong>入力前処理 → MLflow PyFunc予測 → 出力後処理（ユーザーフレンドリーなフォーマット）</p>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>PyFuncが有用な理由：推論の前後にデータを変換でき互換性と最適化された出力を確保（APIコスト最小化・再トレーニング削減ではない）</li>
+          <li>「後処理なしに前処理のみ」は不正解 → 後処理はモデル出力を解釈可能にするために不可欠</li>
+          <li>「生の入力を直接モデルに渡す」は不正解 → 前処理でデータ品質を確保し予測信頼性を向上させる</li>
+        </ul>
+      </div>
+    </section>
+
+<!-- 9. エージェント -->
     <section class="topic">
       <h3>エージェントシステムとツール設計</h3>
       <p>複数のツール・データソース・操作を組み合わせて複雑なタスクを自律的に処理するLLMベースのシステム。注文状況・配送・返金など複数操作が必要なカスタマーサポートに適している。</p>
@@ -267,7 +304,7 @@
       </div>
     </section>
 
-    <!-- 10. LLMモデル選択 -->
+<!-- 10. LLMモデル選択 -->
     <section class="topic">
       <h3>LLMモデル選択基準</h3>
       <p>ユースケースに応じて適切なLLMを選択することが重要。コンテキストウィンドウサイズ・ドメイン特化度・多言語対応・コスト・latencyが主要な選択基準。</p>
@@ -300,7 +337,28 @@
       </div>
     </section>
 
-    <!-- 11. 評価指標 -->
+<!-- 7. ガードレール -->
+    <section class="topic">
+      <h3>ガードレール・セーフティフィルター</h3>
+      <p>LLMアプリケーションの出力が安全・正確であり、アプリケーション要件に沿っていることを確保するための制御機構。ハルシネーション・有害応答・プライバシー侵害などのリスクを軽減する。</p>
+      <ul>
+        <li><strong>metapromptによるガードレール</strong>：機密情報を出力しないよう指示するルールをシステムプロンプトで定義</li>
+        <li><strong>入力サニタイズ</strong>：特殊文字の削除とデータ形式検証によるインジェクション攻撃防止</li>
+        <li><strong>コンテンツフィルタリング</strong>：安全でない・有害な応答を除外する事前定義フィルター</li>
+        <li><strong>Retrievalベース拡張</strong>：検索した情報で応答を根拠づけ不正確な生成を防止</li>
+      </ul>
+      <div class="exam-point">
+        <strong>試験頻出ポイント</strong>
+        <ul>
+          <li>ガードレールの目的：latency削減・多様性向上ではなく、安全・正確・アプリ要件整合の確保</li>
+          <li>インジェクション攻撃防止 → 入力サニタイズ（特殊文字削除 ＋ データ形式検証）</li>
+          <li>「temperatureを下げれば安全になる」は不正解 → temperatureは安全性に影響しない</li>
+          <li>「監視・ログだけで十分」は不正解 → 悪意ある入力の実行を防がない</li>
+        </ul>
+      </div>
+    </section>
+
+<!-- 11. 評価指標 -->
     <section class="topic">
       <h3>評価指標（ROUGE・BLEU・Precision/Recall/NDCG）</h3>
       <p>LLMアプリケーションの品質評価には用途に応じた指標の選択が重要。「要約品質」「翻訳品質」「検索品質」「運用パフォーマンス」の4カテゴリに分類できる。</p>
@@ -328,7 +386,7 @@
       </div>
     </section>
 
-    <!-- 12. コスト・Latency最適化 -->
+<!-- 12. コスト・Latency最適化 -->
     <section class="topic">
       <h3>コスト・Latency最適化</h3>
       <p>本番環境でのLLMアプリケーション運用において、コスト効率と低latencyを両立させることが重要。モデルサイズ・インフラ・キャッシュ・スケーリング戦略が主な最適化手段。</p>
@@ -350,7 +408,7 @@
       </div>
     </section>
 
-    <!-- 13. ファインチューニング -->
+<!-- 13. ファインチューニング -->
     <section class="topic">
       <h3>ファインチューニングの適用場面</h3>
       <p>事前学習済みモデルを特定ドメインのデータでさらに学習させる手法。汎用モデルではカバーしきれないドメイン固有の知識・スタイル・トーンをモデルに習得させるために使用する。</p>
@@ -471,5 +529,14 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+  <!-- アウトライン（目次サイドバー） -->
+  <aside class="outline" id="outline">
+    <div class="outline-header"><span>目次</span><button class="outline-close" onclick="closeOutline()">&#x2715;</button></div>
+    <nav class="outline-nav" id="outline-nav"></nav>
+  </aside>
+  <button class="outline-toggle" id="outline-toggle" onclick="toggleOutline()" aria-label="目次を開く">&#x2630;</button>
+
+  <script src="_outline.js"></script>
 </body>
 </html>

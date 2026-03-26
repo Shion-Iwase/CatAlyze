@@ -57,11 +57,72 @@
       </table>
     </section>
 
+    <!-- 2.5 全体像 -->
+    <section>
+      <h2 class="section-title">全体像とトピックのつながり</h2>
+      <div class="domain-map">
+        <div class="domain-map-story">
+          「測る・監視する・最適化する」3段階の活動を扱う。重要な前提は<strong>指標の使い分け</strong>：生成品質（ROUGE/BLEU/Perplexity）・検索品質（Precision/Recall/NDCG）・本番運用（Latency/Throughput/Error Rate）は別物であり混同しないことが合格の鍵。MLflowで評価を管理し、Inference Loggingで本番を監視し、コスト最適化で効率を高める。
+        </div>
+        <h3>主要フロー</h3>
+        <div class="domain-flow">
+          <span class="flow-step">RAG評価設計（検索＋生成の分離）</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">MLflow追跡</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">Inference Logging</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">本番監視</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-step">コスト最適化</span>
+        </div>
+        <h3>トピック群</h3>
+        <div class="domain-clusters">
+          <div class="cluster">
+            <div class="cluster-title">📏 評価指標</div>
+            <ul class="cluster-items">
+              <li>生成品質：ROUGE / BLEU / Perplexity</li>
+              <li>検索品質：Precision / Recall / NDCG</li>
+              <li>RAGシステムの分離評価</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">🔧 評価ツール</div>
+            <ul class="cluster-items">
+              <li>MLflowによる評価・追跡</li>
+              <li>LLM-as-a-Judge</li>
+              <li>チャンキング戦略の評価</li>
+              <li>Context Length管理</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">📡 本番監視</div>
+            <ul class="cluster-items">
+              <li>Latency / Throughput / エラーレート</li>
+              <li>Inference Tables</li>
+              <li>GPU使用率監視</li>
+              <li>スケーラビリティ評価</li>
+            </ul>
+          </div>
+          <div class="cluster">
+            <div class="cluster-title">💰 最適化</div>
+            <ul class="cluster-items">
+              <li>コスト最適化と監視</li>
+              <li>プロビジョニング vs 従量制</li>
+              <li>モデル選定基準</li>
+              <li>応答の多様性</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 3. 出題内容詳細 -->
     <section>
       <h2 class="section-title">出題内容詳細</h2>
 
-      <section class="topic">
+
+<section class="topic">
         <h3>RAGシステムの評価（検索と生成の分離評価）</h3>
         <p>
           RAGシステムは「検索（Retrieval）」と「生成（Generation）」の2つのコンポーネントで構成されており、
@@ -85,7 +146,7 @@
         </div>
       </section>
 
-      <section class="topic">
+<section class="topic">
         <h3>テキスト生成品質指標：ROUGE・BLEU・Perplexity</h3>
         <p>
           テキストの品質を定量的に評価するための標準指標群。これらはすべて「生成品質（Generation Quality）」の指標であり、
@@ -118,7 +179,7 @@
         </div>
       </section>
 
-      <section class="topic">
+<section class="topic">
         <h3>検索品質指標：Precision・Recall・NDCG・Retrieval Latency</h3>
         <p>
           RAGシステムの検索ステップの品質を評価するための指標群。
@@ -150,55 +211,7 @@
         </div>
       </section>
 
-      <section class="topic">
-        <h3>本番モニタリング指標：Latency・Throughput・エラーレート</h3>
-        <p>
-          デプロイされたLLMアプリケーションの運用パフォーマンスを監視するための3つの主要指標。
-          言語品質指標（BLEU/ROUGE）やタスク固有の評価指標（Precision/F1）とは明確に区別される。
-        </p>
-        <ul>
-          <li><strong>Latency（レイテンシ）</strong>: 応答時間。リアルタイム性が求められるシステムで重要</li>
-          <li><strong>Throughput（スループット）</strong>: 単位時間あたりに処理されたクエリ数。高負荷シナリオでの評価に必要</li>
-          <li><strong>Error Rate（エラーレート）</strong>: エラーの発生頻度。システムの安定性・信頼性を示す</li>
-        </ul>
-        <div class="exam-point">
-          <strong>試験頻出ポイント:</strong>
-          <ul>
-            <li>本番デプロイLLMのパフォーマンス監視 → <strong>Latency・Throughput・エラーレート</strong>が正解</li>
-            <li>カスタマーサービス問い合わせアプリの本番パフォーマンス評価 → 単位時間あたりに処理された顧客問い合わせ件数（<strong>Throughput</strong>）が正解</li>
-            <li>BLEUとperplexityは言語品質・トレーニング指標であり運用監視には使えない</li>
-            <li>精度やF1スコアはタスク固有の評価指標であり運用監視指標ではない</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="topic">
-        <h3>コスト最適化と監視</h3>
-        <p>
-          LLMアプリケーションの推論コストを管理・最適化するための戦略群。
-          Token使用量の監視、モデルサイズ選択（クエリ複雑度に応じた適切なモデル）、
-          クエリのバッチ処理、推論ロギングの活用などが主要な手法。
-        </p>
-        <ul>
-          <li><strong>Token使用量監視</strong>: クエリあたりのトークン消費量を追跡し、コストの高い操作を特定する</li>
-          <li><strong>モデルサイズ選択</strong>: シンプルなクエリには小型LLMを使用し、重要タスクには大型モデルを確保する</li>
-          <li><strong>クエリバッチ処理</strong>: 複数のクエリを1リクエストにまとめてAPI呼び出し回数を削減</li>
-          <li><strong>推論ロギング有効化</strong>: クエリコストの監視・最適化戦略の根拠データを収集</li>
-          <li><strong>GPU使用率監視</strong>: ハードウェアリソースの効率的な活用を確認し不要なコストを削減</li>
-          <li><strong>動的GPUスケーリング</strong>: 需要に基づいてGPUリソースを動的にスケールし、低需要時の無駄なコストを回避</li>
-        </ul>
-        <div class="exam-point">
-          <strong>試験頻出ポイント:</strong>
-          <ul>
-            <li>財務ドキュメント処理RAGのコスト最小化 → <strong>小型LLM使用 + クエリバッチ処理 + 推論ロギング</strong>の3戦略</li>
-            <li>高トラフィックQAシステムのコスト最適化 → <strong>動的GPUスケーリング + token使用量監視 + inference logging</strong></li>
-            <li>Context Lengthを増やすとtoken使用量が<strong>増加</strong>しコストが上昇する（コスト削減にはならない）</li>
-            <li>頻繁な出力のキャッシュはlatencyを削減するが<strong>LLM推論コストには大きな影響を与えない</strong></li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="topic">
+<section class="topic">
         <h3>MLflowによる評価・追跡</h3>
         <p>
           MLflowはDatabricks上でモデルの評価・追跡・管理を行うためのオープンソースフレームワーク。
@@ -221,7 +234,74 @@
         </div>
       </section>
 
-      <section class="topic">
+<section class="topic">
+        <h3>LLM-as-a-Judge による評価</h3>
+        <p>
+          LLM自身を評価者（judge）として使い、他のLLMの出力品質を評価する手法。
+          チャンキング戦略の最適化など、定量的指標が難しい評価に活用できる。
+          ただし<strong>主観的</strong>であり、専用のテストデータセットを使った評価より信頼性が低い場合がある。
+        </p>
+        <ul>
+          <li><strong>チャンキング評価への応用</strong>: 特定のチャンクが以前の質問にどれだけ答えられているかをLLM-as-a-judgeで評価し、チャンキングパラメータを最適化する</li>
+          <li><strong>主観性の問題</strong>: LLM-as-a-judgeは主観的であり、作成済みデータセットを使った評価より信頼性が低い</li>
+          <li><strong>補助的手段としての位置づけ</strong>: 専用テストデータセット + MLflow指標が主軸</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>チャンキング戦略の最適化アプローチ → <strong>RecallやNDCGなどの評価指標でのテスト + LLM-as-a-judgeメトリクス</strong>の組み合わせが有効</li>
+            <li>「RAGシステムの評価はLLM-as-a-judgeだけで十分」は誤り — 主観的で信頼性が低く、データセット + MLflow指標と組み合わせが推奨される</li>
+          </ul>
+        </div>
+      </section>
+
+<section class="topic">
+        <h3>チャンキング戦略の評価・最適化</h3>
+        <p>
+          RAGシステムのドキュメントチャンキング戦略（チャンクの分割方法・サイズ）を評価・最適化するための体系的アプローチ。
+          直感的なパラメータ選択から、RecallやNDCGなどの評価指標とLLM-as-a-judgeを組み合わせた科学的アプローチへの移行が重要。
+        </p>
+        <ul>
+          <li><strong>評価指標による戦略テスト</strong>: RecallやNDCGを用いて複数のチャンキング戦略（段落分割・チャプター分割など）を比較</li>
+          <li><strong>LLM-as-a-judge</strong>: 各チャンクが過去の質問にどれだけ答えられているかをLLMで評価し、チャンキングパラメータを最適化</li>
+          <li><strong>embeddingモデル変更との区別</strong>: embeddingモデルの変更はセマンティックアライメント改善だがチャンキング戦略の最適化ではない</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>チャンキング戦略の体系的最適化 → <strong>RecallやNDCGでの評価指標テスト + LLM-as-a-judge</strong>の2アプローチが正解</li>
+            <li>「分類器追加でretrievalをフィルタリング」は誤り: チャンキング戦略の最適化にはならない</li>
+            <li>「LLMに統計量でチャンクサイズを決めさせる」は誤り: 構造化されたアプローチが欠ける</li>
+          </ul>
+        </div>
+      </section>
+
+<section class="topic">
+        <h3>Context Length管理とToken Limit問題</h3>
+        <p>
+          LLMにはトークン数の上限（Context Length）が存在し、入力がこれを超えるとエラーが発生する。
+          RAGシステムではベクトルDBから取得するドキュメントのチャンクサイズや取得レコード数が
+          Context Lengthに大きく影響する。
+        </p>
+        <ul>
+          <li><strong>Context Length</strong>: LLMが一度に処理できるトークンの最大数</li>
+          <li><strong>BAD_REQUEST / InvalidArgument エラー</strong>: token数がcontext lengthを超えた場合に発生</li>
+          <li><strong>チャンクサイズ縮小</strong>: 各ドキュメントから取得されるトークン数を減らし、context limit内に収める</li>
+          <li><strong>取得レコード数の削減</strong>: vector databaseから取得するレコード数を制限して合計token数を削減</li>
+          <li><strong>ALiBi（Attention with Linear Biases）</strong>: 長いコンテキストに対応するためのモデル再トレーニング手法（token limit問題の解決には不要で複雑すぎる）</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>Context Length超過エラーへの対処（モデル変更なし） → <strong>チャンクサイズを小さくする + 取得レコード数を削減</strong>（2つ選択）</li>
+            <li>embeddingモデルのサイズ変更はContext Lengthエラーの解決策にならない</li>
+            <li>output tokensの削減はinput tokenの超過問題に対処しない</li>
+            <li>コスト・latency優先のembeddingモデル設定 → チャンクサイズに合わせたcontext length（512） + 最小モデルサイズ + 最小embedding次元</li>
+          </ul>
+        </div>
+      </section>
+
+<section class="topic">
         <h3>Inference Logging と Inference Tables</h3>
         <p>
           Inference Loggingはデプロイされたモデルエンドポイントへの推論リクエスト・レスポンスの詳細を記録する仕組み。
@@ -254,74 +334,49 @@
         </div>
       </section>
 
-      <section class="topic">
-        <h3>LLM-as-a-Judge による評価</h3>
+<section class="topic">
+        <h3>本番モニタリング指標：Latency・Throughput・エラーレート</h3>
         <p>
-          LLM自身を評価者（judge）として使い、他のLLMの出力品質を評価する手法。
-          チャンキング戦略の最適化など、定量的指標が難しい評価に活用できる。
-          ただし<strong>主観的</strong>であり、専用のテストデータセットを使った評価より信頼性が低い場合がある。
+          デプロイされたLLMアプリケーションの運用パフォーマンスを監視するための3つの主要指標。
+          言語品質指標（BLEU/ROUGE）やタスク固有の評価指標（Precision/F1）とは明確に区別される。
         </p>
         <ul>
-          <li><strong>チャンキング評価への応用</strong>: 特定のチャンクが以前の質問にどれだけ答えられているかをLLM-as-a-judgeで評価し、チャンキングパラメータを最適化する</li>
-          <li><strong>主観性の問題</strong>: LLM-as-a-judgeは主観的であり、作成済みデータセットを使った評価より信頼性が低い</li>
-          <li><strong>補助的手段としての位置づけ</strong>: 専用テストデータセット + MLflow指標が主軸</li>
+          <li><strong>Latency（レイテンシ）</strong>: 応答時間。リアルタイム性が求められるシステムで重要</li>
+          <li><strong>Throughput（スループット）</strong>: 単位時間あたりに処理されたクエリ数。高負荷シナリオでの評価に必要</li>
+          <li><strong>Error Rate（エラーレート）</strong>: エラーの発生頻度。システムの安定性・信頼性を示す</li>
         </ul>
         <div class="exam-point">
           <strong>試験頻出ポイント:</strong>
           <ul>
-            <li>チャンキング戦略の最適化アプローチ → <strong>RecallやNDCGなどの評価指標でのテスト + LLM-as-a-judgeメトリクス</strong>の組み合わせが有効</li>
-            <li>「RAGシステムの評価はLLM-as-a-judgeだけで十分」は誤り — 主観的で信頼性が低く、データセット + MLflow指標と組み合わせが推奨される</li>
+            <li>本番デプロイLLMのパフォーマンス監視 → <strong>Latency・Throughput・エラーレート</strong>が正解</li>
+            <li>カスタマーサービス問い合わせアプリの本番パフォーマンス評価 → 単位時間あたりに処理された顧客問い合わせ件数（<strong>Throughput</strong>）が正解</li>
+            <li>BLEUとperplexityは言語品質・トレーニング指標であり運用監視には使えない</li>
+            <li>精度やF1スコアはタスク固有の評価指標であり運用監視指標ではない</li>
           </ul>
         </div>
       </section>
 
-      <section class="topic">
-        <h3>Context Length管理とToken Limit問題</h3>
+<section class="topic">
+        <h3>GPU使用率監視</h3>
         <p>
-          LLMにはトークン数の上限（Context Length）が存在し、入力がこれを超えるとエラーが発生する。
-          RAGシステムではベクトルDBから取得するドキュメントのチャンクサイズや取得レコード数が
-          Context Lengthに大きく影響する。
+          ハードウェアリソースの効率的な活用を確認し不要なコストを削減するための監視指標。
+          コスト最適化戦略の一環として、GPU使用率の追跡は高負荷・低負荷両シナリオで有効。
         </p>
         <ul>
-          <li><strong>Context Length</strong>: LLMが一度に処理できるトークンの最大数</li>
-          <li><strong>BAD_REQUEST / InvalidArgument エラー</strong>: token数がcontext lengthを超えた場合に発生</li>
-          <li><strong>チャンクサイズ縮小</strong>: 各ドキュメントから取得されるトークン数を減らし、context limit内に収める</li>
-          <li><strong>取得レコード数の削減</strong>: vector databaseから取得するレコード数を制限して合計token数を削減</li>
-          <li><strong>ALiBi（Attention with Linear Biases）</strong>: 長いコンテキストに対応するためのモデル再トレーニング手法（token limit問題の解決には不要で複雑すぎる）</li>
+          <li><strong>GPU使用率（GPU Utilization）</strong>: GPU処理能力がどの程度使われているかを示す。低使用率は無駄なコストを示す</li>
+          <li><strong>動的スケーリングとの組み合わせ</strong>: GPU使用率監視と動的スケーリングを組み合わせることで、需要変動に応じたコスト最適化が可能</li>
+          <li><strong>本番監視の3点セット</strong>: MLflow（retrieval指標） + Inference Logging（token/latency） + GPU使用率監視</li>
         </ul>
         <div class="exam-point">
           <strong>試験頻出ポイント:</strong>
           <ul>
-            <li>Context Length超過エラーへの対処（モデル変更なし） → <strong>チャンクサイズを小さくする + 取得レコード数を削減</strong>（2つ選択）</li>
-            <li>embeddingモデルのサイズ変更はContext Lengthエラーの解決策にならない</li>
-            <li>output tokensの削減はinput tokenの超過問題に対処しない</li>
-            <li>コスト・latency優先のembeddingモデル設定 → チャンクサイズに合わせたcontext length（512） + 最小モデルサイズ + 最小embedding次元</li>
+            <li>DatabricksのRAGアプリのシステムパフォーマンスとコスト監視 → <strong>MLflow + Inference Logging + GPU使用率監視</strong>の3点セット</li>
+            <li>高トラフィックQAシステムのコスト最適化 → <strong>動的GPUスケーリング + token使用量監視 + inference logging</strong></li>
           </ul>
         </div>
       </section>
 
-      <section class="topic">
-        <h3>チャンキング戦略の評価・最適化</h3>
-        <p>
-          RAGシステムのドキュメントチャンキング戦略（チャンクの分割方法・サイズ）を評価・最適化するための体系的アプローチ。
-          直感的なパラメータ選択から、RecallやNDCGなどの評価指標とLLM-as-a-judgeを組み合わせた科学的アプローチへの移行が重要。
-        </p>
-        <ul>
-          <li><strong>評価指標による戦略テスト</strong>: RecallやNDCGを用いて複数のチャンキング戦略（段落分割・チャプター分割など）を比較</li>
-          <li><strong>LLM-as-a-judge</strong>: 各チャンクが過去の質問にどれだけ答えられているかをLLMで評価し、チャンキングパラメータを最適化</li>
-          <li><strong>embeddingモデル変更との区別</strong>: embeddingモデルの変更はセマンティックアライメント改善だがチャンキング戦略の最適化ではない</li>
-        </ul>
-        <div class="exam-point">
-          <strong>試験頻出ポイント:</strong>
-          <ul>
-            <li>チャンキング戦略の体系的最適化 → <strong>RecallやNDCGでの評価指標テスト + LLM-as-a-judge</strong>の2アプローチが正解</li>
-            <li>「分類器追加でretrievalをフィルタリング」は誤り: チャンキング戦略の最適化にはならない</li>
-            <li>「LLMに統計量でチャンクサイズを決めさせる」は誤り: 構造化されたアプローチが欠ける</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="topic">
+<section class="topic">
         <h3>スケーラビリティ評価</h3>
         <p>
           本番LLMアプリケーションが増加するクエリ量に対応できるか（スケーラビリティ）を評価するための指標と戦略。
@@ -344,28 +399,33 @@
         </div>
       </section>
 
-      <section class="topic">
-        <h3>応答の多様性（エンゲージメント指標）</h3>
+<section class="topic">
+        <h3>コスト最適化と監視</h3>
         <p>
-          チャットボットのユーザーエンゲージメントとリテンションを高めるための指標。
-          応答の多様性（Response Diversity）は、同じような応答の繰り返しを避けてユーザーの興味を維持するために重要。
-          ランダム性（Randomness）とは異なり、文脈に合った多様な応答を生成する能力を指す。
+          LLMアプリケーションの推論コストを管理・最適化するための戦略群。
+          Token使用量の監視、モデルサイズ選択（クエリ複雑度に応じた適切なモデル）、
+          クエリのバッチ処理、推論ロギングの活用などが主要な手法。
         </p>
         <ul>
-          <li><strong>応答の多様性（Response Diversity）</strong>: ユーザーの興味を維持し、エンゲージメントとリテンションを向上させる</li>
-          <li><strong>ランダム性との違い</strong>: ランダム性はユーザーを混乱させるリスクがあるが、多様性は文脈に合った異なる応答を提供する</li>
-          <li><strong>応答の繰り返しの問題</strong>: 同じ応答の繰り返しはユーザーを飽き飽きさせリテンションを低下させる</li>
+          <li><strong>Token使用量監視</strong>: クエリあたりのトークン消費量を追跡し、コストの高い操作を特定する</li>
+          <li><strong>モデルサイズ選択</strong>: シンプルなクエリには小型LLMを使用し、重要タスクには大型モデルを確保する</li>
+          <li><strong>クエリバッチ処理</strong>: 複数のクエリを1リクエストにまとめてAPI呼び出し回数を削減</li>
+          <li><strong>推論ロギング有効化</strong>: クエリコストの監視・最適化戦略の根拠データを収集</li>
+          <li><strong>GPU使用率監視</strong>: ハードウェアリソースの効率的な活用を確認し不要なコストを削減</li>
+          <li><strong>動的GPUスケーリング</strong>: 需要に基づいてGPUリソースを動的にスケールし、低需要時の無駄なコストを回避</li>
         </ul>
         <div class="exam-point">
           <strong>試験頻出ポイント:</strong>
           <ul>
-            <li>ゲーミングchatbotのエンゲージメント・リテンション向上 → <strong>応答の多様性</strong>が正解（ランダム性や応答の繰り返しは不正解）</li>
-            <li>ランダム性はユーザーを混乱させエンゲージメントを低下させる可能性がある</li>
+            <li>財務ドキュメント処理RAGのコスト最小化 → <strong>小型LLM使用 + クエリバッチ処理 + 推論ロギング</strong>の3戦略</li>
+            <li>高トラフィックQAシステムのコスト最適化 → <strong>動的GPUスケーリング + token使用量監視 + inference logging</strong></li>
+            <li>Context Lengthを増やすとtoken使用量が<strong>増加</strong>しコストが上昇する（コスト削減にはならない）</li>
+            <li>頻繁な出力のキャッシュはlatencyを削減するが<strong>LLM推論コストには大きな影響を与えない</strong></li>
           </ul>
         </div>
       </section>
 
-      <section class="topic">
+<section class="topic">
         <h3>プロビジョニングスループット vs トークン課金（従量制）</h3>
         <p>
           Databricksでのモデルデプロイにおける2つの課金モデル。
@@ -386,27 +446,7 @@
         </div>
       </section>
 
-      <section class="topic">
-        <h3>GPU使用率監視</h3>
-        <p>
-          ハードウェアリソースの効率的な活用を確認し不要なコストを削減するための監視指標。
-          コスト最適化戦略の一環として、GPU使用率の追跡は高負荷・低負荷両シナリオで有効。
-        </p>
-        <ul>
-          <li><strong>GPU使用率（GPU Utilization）</strong>: GPU処理能力がどの程度使われているかを示す。低使用率は無駄なコストを示す</li>
-          <li><strong>動的スケーリングとの組み合わせ</strong>: GPU使用率監視と動的スケーリングを組み合わせることで、需要変動に応じたコスト最適化が可能</li>
-          <li><strong>本番監視の3点セット</strong>: MLflow（retrieval指標） + Inference Logging（token/latency） + GPU使用率監視</li>
-        </ul>
-        <div class="exam-point">
-          <strong>試験頻出ポイント:</strong>
-          <ul>
-            <li>DatabricksのRAGアプリのシステムパフォーマンスとコスト監視 → <strong>MLflow + Inference Logging + GPU使用率監視</strong>の3点セット</li>
-            <li>高トラフィックQAシステムのコスト最適化 → <strong>動的GPUスケーリング + token使用量監視 + inference logging</strong></li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="topic">
+<section class="topic">
         <h3>モデル選定基準（LLM選択時の評価軸）</h3>
         <p>
           ユースケースに適したLLMを選択するための評価基準。
@@ -434,9 +474,28 @@
         </div>
       </section>
 
-    </section>
+<section class="topic">
+        <h3>応答の多様性（エンゲージメント指標）</h3>
+        <p>
+          チャットボットのユーザーエンゲージメントとリテンションを高めるための指標。
+          応答の多様性（Response Diversity）は、同じような応答の繰り返しを避けてユーザーの興味を維持するために重要。
+          ランダム性（Randomness）とは異なり、文脈に合った多様な応答を生成する能力を指す。
+        </p>
+        <ul>
+          <li><strong>応答の多様性（Response Diversity）</strong>: ユーザーの興味を維持し、エンゲージメントとリテンションを向上させる</li>
+          <li><strong>ランダム性との違い</strong>: ランダム性はユーザーを混乱させるリスクがあるが、多様性は文脈に合った異なる応答を提供する</li>
+          <li><strong>応答の繰り返しの問題</strong>: 同じ応答の繰り返しはユーザーを飽き飽きさせリテンションを低下させる</li>
+        </ul>
+        <div class="exam-point">
+          <strong>試験頻出ポイント:</strong>
+          <ul>
+            <li>ゲーミングchatbotのエンゲージメント・リテンション向上 → <strong>応答の多様性</strong>が正解（ランダム性や応答の繰り返しは不正解）</li>
+            <li>ランダム性はユーザーを混乱させエンゲージメントを低下させる可能性がある</li>
+          </ul>
+        </div>
+      </section>
 
-    <!-- 4. 理解度チェックシート -->
+      <!-- 4. 理解度チェックシート -->
     <section class="check-sheet">
       <h2 class="section-title">理解度チェックシート</h2>
 
@@ -542,5 +601,14 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
+
+  <!-- アウトライン（目次サイドバー） -->
+  <aside class="outline" id="outline">
+    <div class="outline-header"><span>目次</span><button class="outline-close" onclick="closeOutline()">&#x2715;</button></div>
+    <nav class="outline-nav" id="outline-nav"></nav>
+  </aside>
+  <button class="outline-toggle" id="outline-toggle" onclick="toggleOutline()" aria-label="目次を開く">&#x2630;</button>
+
+  <script src="_outline.js"></script>
 </body>
 </html>
